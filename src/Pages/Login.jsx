@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import '../Stylesheet/Login/LoginPage.css';
+import '../Stylesheet/Login/loginPage.css';
 
 const Login = () => {
   const [formData, setFormData] = useState({
