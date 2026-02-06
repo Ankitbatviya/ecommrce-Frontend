@@ -28,7 +28,6 @@ import AdminUsers from '../Pages/admin/AdminUsers'
 import AdminProducts from '../Pages/admin/AdminProducts'
 import AdminOrders from '../Pages/admin/AdminOrders'
 import AdminOrderDetail from '../Pages/admin/AdminOrderDetail'
-import AdminSettings from '../Pages/admin/AdminSettings' // Optional: for admin settings
 
 // Components
 import ProtectedRoute from './ProtectedRoute'
@@ -152,12 +151,7 @@ function Layout() {
             <AdminOrderDetail />
           </ProtectedRoute>
         } />
-        
-        <Route path="/admin/settings" element={
-          <ProtectedRoute requiredRole="admin">
-            <AdminSettings />
-          </ProtectedRoute>
-        } />
+
         
         {/* ===================== 404 ROUTE ===================== */}
         <Route path="*" element={

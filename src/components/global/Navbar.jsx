@@ -1,404 +1,189 @@
-// components/global/Navbar.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { toggleTheme } from '../../redux/themeSlice';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
+import { 
+  ShoppingCart, User, Menu, X, ChevronDown, 
+  LayoutDashboard, Package, LogOut, ShoppingBag, 
+  Info, PhoneCall, Sun, Moon 
+} from 'lucide-react';
 import Logo from '../../assets/SVG/Logo.svg';
-import '../../Stylesheet/Global/Navbar.css';
 
 function Navbar() {
+  const isDark = useSelector((state) => state.theme.isDark);
+  const dispatch = useDispatch();
+  
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
+  
   const navigate = useNavigate();
+  const location = useLocation();
   const dropdownRef = useRef(null);
   const profileButtonRef = useRef(null);
 
-  // Check authentication status on component mount
   useEffect(() => {
     checkAuthStatus();
-    
-    // Listen for auth changes (e.g., login/logout)
-    const interval = setInterval(checkAuthStatus, 1000);
+    const interval = setInterval(checkAuthStatus, 2000);
     return () => clearInterval(interval);
   }, []);
 
   const checkAuthStatus = () => {
     const token = Cookies.get('authToken');
     const user = Cookies.get('userInfo');
-    
     if (token && user) {
       setIsAuthenticated(true);
-      try {
-        setUserInfo(JSON.parse(user));
-      } catch (e) {
-        setUserInfo(null);
-      }
+      try { setUserInfo(JSON.parse(user)); } catch (e) { setUserInfo(null); }
     } else {
       setIsAuthenticated(false);
       setUserInfo(null);
     }
   };
 
-  // Helper to close menu when a link is clicked
-  const closeMenu = () => {
-    setIsMenuOpen(false);
-    setShowUserDropdown(false);
-  };
-
-  // Helper for navigation buttons
-  const handleNav = (path) => {
-    navigate(path);
-    closeMenu();
-  };
-
-  // Logout handler
   const handleLogout = () => {
     Cookies.remove('authToken');
     Cookies.remove('userInfo');
-    Cookies.remove('userRole');
-    
     setIsAuthenticated(false);
-    setUserInfo(null);
-    
-    toast.success('Logged out successfully!');
-    
-    closeMenu();
+    toast.success('System Offline');
+    setIsMenuOpen(false);
     navigate('/');
   };
 
-  // User dropdown toggle
-  const toggleUserDropdown = (e) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setShowUserDropdown(!showUserDropdown);
-  };
-
-  // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (showUserDropdown && 
-          dropdownRef.current && 
-          profileButtonRef.current &&
-          !dropdownRef.current.contains(event.target) &&
-          !profileButtonRef.current.contains(event.target)) {
+    const handleClick = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target) && !profileButtonRef.current.contains(e.target)) {
         setShowUserDropdown(false);
       }
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, [showUserDropdown]);
-
-  // Close mobile menu when window is resized to desktop
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth > 992) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  // Prevent body scroll when mobile menu is open
   useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
+    document.body.style.overflow = isMenuOpen ? 'hidden' : 'unset';
   }, [isMenuOpen]);
 
-  // Get role display text
-  const getRoleDisplay = (role) => {
-    switch(role) {
-      case 'admin': return 'Administrator';
-      case 'partner': return 'Partner';
-      default: return 'Customer';
-    }
-  };
+  const navLinks = [
+    { name: 'Home', path: '/', icon: ShoppingBag },
+    { name: 'Products', path: '/products', icon: Package },
+    { name: 'About', path: '/aboutus', icon: Info },
+    { name: 'Contact', path: '/contact', icon: PhoneCall },
+  ];
 
-  // Get role color class
-  const getRoleColorClass = (role) => {
-    switch(role) {
-      case 'admin': return 'admin';
-      case 'partner': return 'partner';
-      default: return 'user';
-    }
-  };
+  const themeStyles = isDark 
+    ? "bg-black/80 border-white/10 text-white shadow-2xl shadow-black/50" 
+    : "bg-white/80 border-gray-200 text-gray-900 shadow-lg";
 
   return (
-    <header className='Header'>
-      <nav className='Nav'>
-        <div className="NavBrand">
-          <img 
-            src={Logo} 
-            alt="Brand Logo" 
-            className="BrandLogo" 
-            onClick={() => handleNav('/')} 
-          />
-          <span className="BrandName" onClick={() => handleNav('/')}>ESSENTIAL</span>
-        </div>
-
-        {/* Hamburger Menu Toggle */}
-        <div 
-          className={`MenuToggle ${isMenuOpen ? 'is-active' : ''}`} 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle navigation"
-        >
-          <span className="bar"></span>
-          <span className="bar"></span>
-          <span className="bar"></span>
-        </div>
-
-        {/* Navigation Links */}
-        <ul className={`NavList ${isMenuOpen ? 'show-mobile' : ''}`}>
-          <li><Link to="/" onClick={closeMenu}>Home</Link></li>
-          <li><Link to="/products" onClick={closeMenu}>Products</Link></li>
-          <li><Link to="/aboutus" onClick={closeMenu}>About</Link></li>
-          <li><Link to="/contact" onClick={closeMenu}>Contact</Link></li>
+    <header className="fixed top-0 w-full z-[100] font-sans">
+      <nav className="mx-auto max-w-7xl mt-4 px-4 sm:px-6">
+        <div className={`${themeStyles} backdrop-blur-xl border rounded-2xl px-5 py-3 flex items-center justify-between transition-all duration-500`}>
           
-          {/* Mobile Only Actions */}
-          <div className="mobile-only">
-            {isAuthenticated ? (
-              <>
-                <div className="mobile-user-info">
-                  <div className="mobile-user-avatar">
-                    {userInfo?.fullname?.charAt(0) || 'U'}
-                  </div>
-                  <div className="mobile-user-details">
-                    <h4>{userInfo?.fullname || 'User'}</h4>
-                    <span className={`mobile-user-role ${getRoleColorClass(userInfo?.role)}`}>
-                      {getRoleDisplay(userInfo?.role)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="mobile-nav-section">
-                  <button className='NavCartBtn' onClick={() => handleNav('/cart')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="9" cy="21" r="1"/>
-                      <circle cx="20" cy="21" r="1"/>
-                      <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                    </svg>
-                    Cart
-                  </button>
-                  
-                  <button className='mobile-nav-item' onClick={() => handleNav('/profile')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    My Profile
-                  </button>
-                  
-                  <button className='mobile-nav-item' onClick={() => handleNav('/orders')}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-                    </svg>
-                    My Orders
-                  </button>
-                  
-
-                  {userInfo?.role === 'admin' && (
-                    <div className="mobile-admin-section">
-                      <div className="mobile-section-title">Admin Panel</div>
-                      <button className='mobile-nav-item admin-item' onClick={() => handleNav('/admin/dashboard')}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="3" width="7" height="7"/>
-                          <rect x="14" y="3" width="7" height="7"/>
-                          <rect x="14" y="14" width="7" height="7"/>
-                          <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                        Dashboard
-                      </button>
-                      <button className='mobile-nav-item admin-item' onClick={() => handleNav('/admin/products')}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        </svg>
-                        Manage Products
-                      </button>
-                      <button className='mobile-nav-item admin-item' onClick={() => handleNav('/admin/users')}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                          <circle cx="9" cy="7" r="4"/>
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                        Manage Users
-                      </button>
-                    </div>
-                  )}
-
-                  <div className="mobile-divider"></div>
-                  
-                  <button className='NavLogoutBtn' onClick={handleLogout}>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                      <polyline points="16 17 21 12 16 7"/>
-                      <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="mobile-actions">
-                <button className='NavCartBtn' onClick={() => handleNav('/cart')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="9" cy="21" r="1"/>
-                    <circle cx="20" cy="21" r="1"/>
-                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                  </svg>
-                  Cart
-                </button>
-                <button className='NavLoginBtn' onClick={() => handleNav('/login')}>Login</button>
-                <button className='NavSignUpBtn' onClick={() => handleNav('/signup')}>Sign Up</button>
-              </div>
-            )}
-          </div>
-        </ul>
-
-        {/* Action buttons for Desktop */}
-        <div className="NavActions desktop-only">
-          <button className='NavCartBtn' onClick={() => handleNav('/cart')}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="9" cy="21" r="1"/>
-              <circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-            </svg>
-            Cart
-          </button>
-          
-          {isAuthenticated ? (
-            <div className="user-dropdown-container">
-              <button 
-                ref={profileButtonRef}
-                className="user-profile-btn" 
-                onClick={toggleUserDropdown}
-                aria-label="User menu"
-                aria-expanded={showUserDropdown}
-              >
-                <div className="user-avatar">
-                  {userInfo?.fullname?.charAt(0) || 'U'}
-                </div>
-                <span className="user-name">{userInfo?.fullname?.split(' ')[0] || 'User'}</span>
-                <svg 
-                  className={`dropdown-arrow ${showUserDropdown ? 'rotated' : ''}`} 
-                  width="16" 
-                  height="16" 
-                  viewBox="0 0 24 24" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth="2"
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-              
-              {showUserDropdown && (
-                <div className="user-dropdown-menu" ref={dropdownRef}>
-                  <div className="dropdown-header">
-                    <div className="dropdown-avatar">
-                      {userInfo?.fullname?.charAt(0) || 'U'}
-                    </div>
-                    <div className="dropdown-user-name">{userInfo?.fullname || 'User'}</div>
-                    <div className="dropdown-user-email">{userInfo?.email || 'user@example.com'}</div>
-                    <span className={`dropdown-user-role ${getRoleColorClass(userInfo?.role)}`}>
-                      {getRoleDisplay(userInfo?.role)}
-                    </span>
-                  </div>
-
-                  <div className="dropdown-section-title">Account</div>
-                  
-                  <button className="dropdown-item" onClick={() => handleNav('/profile')}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                      <circle cx="12" cy="7" r="4"/>
-                    </svg>
-                    My Profile
-                  </button>
-                  
-                  <button className="dropdown-item" onClick={() => handleNav('/orders')}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>
-                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-                    </svg>
-                    My Orders
-                  </button>
-                  
-
-
-                  {userInfo?.role === 'admin' && (
-                    <>
-                      <div className="dropdown-divider"></div>
-                      <div className="dropdown-section-title">Admin</div>
-                      
-                      <button className="dropdown-item admin-item" onClick={() => handleNav('/admin/dashboard')}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <rect x="3" y="3" width="7" height="7"/>
-                          <rect x="14" y="3" width="7" height="7"/>
-                          <rect x="14" y="14" width="7" height="7"/>
-                          <rect x="3" y="14" width="7" height="7"/>
-                        </svg>
-                        Dashboard
-                      </button>
-                      
-                      <button className="dropdown-item admin-item" onClick={() => handleNav('/admin/products')}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                        </svg>
-                        Manage Products
-                      </button>
-                      
-                      <button className="dropdown-item admin-item" onClick={() => handleNav('/admin/users')}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                          <circle cx="9" cy="7" r="4"/>
-                          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                          <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                        </svg>
-                        Manage Users
-                      </button>
-                    </>
-                  )}
-
-                  <div className="dropdown-divider"></div>
-                  
-                  <button className="dropdown-item logout-item" onClick={handleLogout}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                      <polyline points="16 17 21 12 16 7"/>
-                      <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                    Logout
-                  </button>
-                </div>
-              )}
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => navigate('/')}>
+            <div className={`w-10 h-10 ${isDark ? 'bg-amber-500' : 'bg-black'} rounded-xl flex items-center justify-center transition-all shadow-md`}>
+              <img src={Logo} alt="Logo" className={`w-6 h-6 ${isDark ? '' : 'invert'}`} />
             </div>
-          ) : (
-            <>
-              <button className='NavLoginBtn' onClick={() => handleNav('/login')}>Login</button>
-              <button className='NavSignUpBtn' onClick={() => handleNav('/signup')}>Sign Up</button>
-            </>
-          )}
+            <span className={`font-black tracking-[0.2em] text-lg hidden sm:block uppercase italic ${isDark ? 'text-white' : 'text-black'}`}>Essential</span>
+          </div>
+
+          <ul className="hidden lg:flex items-center gap-10">
+            {navLinks.map((link) => (
+              <li key={link.name}>
+                <Link to={link.path} className={`text-[11px] font-black uppercase tracking-[0.2em] transition-all hover:text-amber-500 ${location.pathname === link.path ? 'text-amber-500' : isDark ? 'text-gray-400' : 'text-gray-500'}`}>{link.name}</Link>
+              </li>
+            ))}
+          </ul>
+
+          <div className="flex items-center gap-3">
+            <button onClick={() => dispatch(toggleTheme())} className={`p-2 rounded-xl transition-all ${isDark ? 'text-amber-500 bg-white/10 hover:bg-white/20' : 'text-gray-500 bg-gray-100 hover:bg-gray-200'}`}>
+              {isDark ? <Sun size={18} strokeWidth={2.5} /> : <Moon size={18} strokeWidth={2.5} />}
+            </button>
+            
+            <button onClick={() => navigate('/cart')} className={`p-2 transition-colors ${isDark ? 'text-gray-400 hover:text-amber-500' : 'text-gray-500 hover:text-amber-500'}`}>
+              <ShoppingCart size={20} strokeWidth={2.5} />
+            </button>
+
+            {isAuthenticated ? (
+              <div className="relative hidden lg:block">
+                <button ref={profileButtonRef} onClick={() => setShowUserDropdown(!showUserDropdown)} className={`flex items-center gap-3 p-1 pr-3 rounded-xl border ${isDark ? 'bg-white/5 border-white/10 hover:bg-white/10' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`}>
+                  <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center font-black text-xs">{userInfo?.fullname?.charAt(0)}</div>
+                  <ChevronDown size={14} className={`transition-transform duration-300 ${isDark ? 'text-white' : 'text-black'} ${showUserDropdown ? 'rotate-180' : ''}`} />
+                </button>
+                {showUserDropdown && (
+                  <div ref={dropdownRef} className={`absolute right-0 mt-4 w-60 border rounded-2xl shadow-2xl p-4 animate-in fade-in zoom-in-95 ${isDark ? 'bg-[#111] border-white/10' : 'bg-white border-gray-100'}`}>
+                    <div className="space-y-1">
+                      <DropdownLink to="/profile" icon={User} label="Profile" isDark={isDark} onClick={() => setShowUserDropdown(false)} />
+                      <DropdownLink to="/orders" icon={ShoppingBag} label="Orders" isDark={isDark} onClick={() => setShowUserDropdown(false)} />
+                      {userInfo?.role === 'admin' && <DropdownLink to="/admin/dashboard" icon={LayoutDashboard} label="Admin Hub" accent isDark={isDark} onClick={() => setShowUserDropdown(false)} />}
+                      <button onClick={handleLogout} className="w-full flex items-center gap-3 p-3 rounded-xl text-red-500 hover:bg-red-500/10 transition-all text-[10px] font-black uppercase mt-2"><LogOut size={16} /> Logout</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button onClick={() => navigate('/login')} className={`hidden lg:block px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm ${isDark ? 'bg-white text-black hover:bg-amber-500' : 'bg-black text-white hover:bg-amber-600'}`}>Join</button>
+            )}
+
+            {/* HAMBURGER BTN THEME FIXED */}
+            <button className={`lg:hidden p-2 rounded-xl transition-all ${isDark ? 'bg-white/10 text-white hover:bg-white/20' : 'bg-gray-100 text-black hover:bg-gray-200'}`} onClick={() => setIsMenuOpen(true)}>
+              <Menu size={22} />
+            </button>
+          </div>
         </div>
       </nav>
+
+      {/* MOBILE DRAWER THEME FIXED */}
+      <div className={`fixed inset-0 z-[200] lg:hidden transition-all duration-500 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}>
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMenuOpen(false)} />
+        <div className={`absolute right-0 top-0 h-full w-[85%] max-w-sm shadow-2xl transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'} ${isDark ? 'bg-[#0a0a0a]' : 'bg-white'}`}>
+          <div className="flex flex-col h-full overflow-y-auto">
+            <div className="p-8 flex items-center justify-between">
+              <span className="font-black text-amber-500 text-2xl uppercase italic tracking-tighter">Menu</span>
+              <button onClick={() => setIsMenuOpen(false)} className={`p-2 rounded-xl ${isDark ? 'bg-white/10 text-white' : 'bg-gray-100 text-black'}`}><X size={20}/></button>
+            </div>
+            
+            <div className="px-8 py-4 space-y-6 flex-1">
+              {navLinks.map(link => (
+                <Link key={link.name} to={link.path} onClick={() => setIsMenuOpen(false)} className={`flex text-4xl font-black tracking-tighter uppercase italic transition-colors ${isDark ? 'text-white hover:text-amber-500' : 'text-black hover:text-amber-500'}`}>
+                  {link.name}
+                </Link>
+              ))}
+            </div>
+
+            <div className={`p-8 space-y-4 border-t ${isDark ? 'border-white/10 bg-white/[0.02]' : 'border-gray-100 bg-gray-50'}`}>
+              {isAuthenticated ? (
+                <>
+                  <div className={`flex items-center gap-4 p-4 rounded-2xl border ${isDark ? 'bg-white/5 border-white/10' : 'bg-white border-gray-200 shadow-sm'}`}>
+                    <div className="w-12 h-12 rounded-xl bg-amber-500 text-black flex items-center justify-center font-black text-xl">{userInfo?.fullname?.charAt(0)}</div>
+                    <div className="min-w-0">
+                      <p className={`font-black uppercase text-xs truncate italic ${isDark ? 'text-white' : 'text-black'}`}>{userInfo?.fullname}</p>
+                      <p className="text-[10px] text-amber-500 font-bold tracking-widest uppercase">{userInfo?.role}</p>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button onClick={() => {navigate('/profile'); setIsMenuOpen(false);}} className={`p-4 rounded-xl text-[10px] font-black uppercase transition-all ${isDark ? 'bg-white/10 text-white border border-white/5' : 'bg-white text-gray-700 border border-gray-200 shadow-sm'}`}>Profile</button>
+                    <button onClick={() => {navigate('/orders'); setIsMenuOpen(false);}} className={`p-4 rounded-xl text-[10px] font-black uppercase transition-all ${isDark ? 'bg-white/10 text-white border border-white/5' : 'bg-white text-gray-700 border border-gray-200 shadow-sm'}`}>Orders</button>
+                  </div>
+                  <button onClick={handleLogout} className="w-full p-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-[10px] font-black uppercase active:scale-95 transition-all">Terminate Session</button>
+                </>
+              ) : (
+                <button onClick={() => {navigate('/login'); setIsMenuOpen(false);}} className="w-full py-5 bg-amber-500 text-black font-black rounded-2xl text-[10px] uppercase shadow-lg active:scale-95 transition-all">Sign In</button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     </header>
   );
 }
+
+const DropdownLink = ({ to, icon: Icon, label, accent, isDark, onClick }) => (
+  <Link to={to} onClick={onClick} className={`flex items-center gap-3 p-3 rounded-xl transition-all text-[10px] font-black uppercase ${accent ? 'text-amber-500 bg-amber-500/10 border border-amber-500/20' : isDark ? 'text-white hover:bg-white/10 hover:text-amber-500' : 'text-gray-700 hover:bg-gray-100 hover:text-amber-600'}`}>
+    <Icon size={16} /> {label}
+  </Link>
+);
 
 export default Navbar;

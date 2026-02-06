@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { toast } from 'react-toastify';
-import '../../Stylesheet/Admin/AdminProducts.css';
+import { PackagePlus, Edit3, Trash2, Search, X, Layers, ChevronRight, ChevronLeft } from 'lucide-react';
+import AdminNav from '../../components/admin/AdminNav';
 
 const AdminProducts = () => {
   const [products, setProducts] = useState([]);
@@ -12,48 +13,29 @@ const AdminProducts = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [isDark, setIsDark] = useState(true);
+  const [formStep, setFormStep] = useState(1);
   const navigate = useNavigate();
 
   const [newProduct, setNewProduct] = useState({
-    name: '',
-    description: '',
-    brand: '',
-    category: 'Apparel',
-    gender: 'Unisex',
-    price: '',
-    discount: '0',
-    sizes: [],
-    colors: [],
-    stock: '',
-    images: [],
-    author: ''
+    name: '', description: '', brand: '', category: 'Apparel',
+    gender: 'Unisex', price: '', discount: '0', sizes: [],
+    colors: [], stock: '', images: [], author: 'Admin'
   });
-
-  useEffect(() => {
-    fetchProducts();
-  }, [categoryFilter, searchTerm]);
 
   const fetchProducts = async () => {
     try {
       const token = Cookies.get('authToken');
       const response = await axios.get('http://localhost:8000/api/products/admin/all', {
         headers: { Authorization: `Bearer ${token}` },
-        params: {
-          category: categoryFilter === 'all' ? '' : categoryFilter,
-          search: searchTerm
-        }
+        params: { category: categoryFilter === 'all' ? '' : categoryFilter, search: searchTerm }
       });
-
-      if (response.data.success) {
-        setProducts(response.data.data || []);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      toast.error('Failed to load products');
-    } finally {
-      setLoading(false);
-    }
+      if (response.data.success) setProducts(response.data.data || []);
+    } catch (e) { toast.error('Catalog sync failed'); }
+    finally { setLoading(false); }
   };
+
+  useEffect(() => { fetchProducts(); }, [categoryFilter, searchTerm]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -69,318 +51,185 @@ const AdminProducts = () => {
     e.preventDefault();
     try {
       const token = Cookies.get('authToken');
-      if (editingProduct) {
-        const response = await axios.put(
-          `http://localhost:8000/api/products/admin/${editingProduct._id}`,
-          newProduct,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (response.data.success) {
-          toast.success('Product updated successfully');
-          setShowAddForm(false);
-          resetForm();
-          fetchProducts();
-        }
-      } else {
-        const response = await axios.post(
-          'http://localhost:8000/api/products/admin',
-          newProduct,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (response.data.success) {
-          toast.success('Product created successfully');
-          setShowAddForm(false);
-          resetForm();
-          fetchProducts();
-        }
+      const url = editingProduct ? `http://localhost:8000/api/products/admin/${editingProduct._id}` : 'http://localhost:8000/api/products/admin';
+      const method = editingProduct ? 'put' : 'post';
+      const response = await axios[method](url, newProduct, { headers: { Authorization: `Bearer ${token}` } });
+      if (response.data.success) {
+        toast.success('Record Synchronized');
+        handleCloseModal();
+        fetchProducts();
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Failed to save product');
-    }
+    } catch (e) { toast.error('Matrix error'); }
+  };
+
+  const handleCloseModal = () => {
+    setShowAddForm(false);
+    setFormStep(1);
+    resetForm();
   };
 
   const resetForm = () => {
-    setNewProduct({
-      name: '', description: '', brand: '', category: 'Apparel',
-      gender: 'Unisex', price: '', discount: '0', sizes: [],
-      colors: [], stock: '', images: [], author: ''
-    });
+    setNewProduct({ name: '', description: '', brand: '', category: 'Apparel', gender: 'Unisex', price: '', discount: '0', sizes: [], colors: [], stock: '', images: [], author: 'Admin' });
     setEditingProduct(null);
   };
 
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-    setNewProduct({
-      name: product.name,
-      description: product.description,
-      brand: product.brand,
-      category: product.category,
-      gender: product.gender,
-      price: product.price,
-      discount: product.discount,
-      sizes: product.sizes || [],
-      colors: product.colors || [],
-      stock: product.stock,
-      images: product.images || [],
-      author: product.author || 'Admin'
-    });
-    setShowAddForm(true);
-  };
+  const theme = isDark 
+    ? { card: 'bg-[#111] border-white/5', input: 'bg-white/5 border-white/10 text-white', option: 'bg-[#1a1a1a] text-white' }
+    : { card: 'bg-white border-slate-200 shadow-sm', input: 'bg-white border-slate-300 text-slate-900', option: 'bg-white text-slate-900' };
 
-  const handleDelete = async (productId, productName) => {
-    if (!window.confirm(`Are you sure you want to delete "${productName}"?`)) return;
-    try {
-      const token = Cookies.get('authToken');
-      const response = await axios.delete(`http://localhost:8000/api/products/admin/${productId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (response.data.success) {
-        toast.success('Product deleted successfully');
-        fetchProducts();
-      }
-    } catch (error) {
-      toast.error('Failed to delete product');
-    }
-  };
-
-  const handleLogout = () => {
-    Cookies.remove('authToken');
-    toast.success('Logged out successfully');
-    navigate('/login');
-  };
-
-  if (loading) return (
-    <div className="admin-loading">
-      <div className="spinner"></div>
-    </div>
-  );
+  if (loading) return <div className={`min-h-screen flex items-center justify-center ${isDark ? 'bg-[#050505]' : 'bg-slate-50'}`}><div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" /></div>;
 
   return (
-    <div className="admin-products">
-      {/* Navigation Bar */}
-      <nav className="admin-navbar">
-        <div className="navbar-content">
-          <div className="navbar-left">
-            <button className="back-btn" onClick={() => navigate('/admin/dashboard')}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 19l-7-7 7-7"/>
-              </svg>
-              Back to Dashboard
+    <div className={`min-h-screen ${isDark ? 'bg-[#050505] text-white' : 'bg-slate-50 text-slate-900'} transition-colors duration-500 pb-32 font-sans overflow-x-hidden`}>
+      <AdminNav isDark={isDark} setIsDark={setIsDark} />
+
+      <main className="max-w-7xl mx-auto pt-24 px-4 animate-in slide-in-from-right-10 duration-700">
+        <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate('/admin/dashboard')} className={`hidden md:flex items-center gap-2 px-4 py-2 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all ${isDark ? 'bg-white/5 border-white/10 text-slate-400 hover:text-amber-500' : 'bg-white border-slate-200 text-slate-600 hover:text-amber-600'}`}>
+              <ChevronLeft size={14} strokeWidth={3} /> Hub
             </button>
-            <div className="logo">
-              <span className="logo-icon">◆</span>
-              <span className="logo-text">AdminPanel</span>
+            <div>
+              <h2 className="text-3xl font-black tracking-tighter italic">Vault.Core</h2>
+              <p className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.3em]">Catalog Operations</p>
             </div>
           </div>
-          <button className="logout-btn" onClick={handleLogout}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
+          <button onClick={() => setShowAddForm(true)} className="flex items-center justify-center gap-2 bg-amber-500 text-black px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-amber-500/20 hover:bg-amber-400 transition-all">
+            <PackagePlus size={16} strokeWidth={3} /> New Entry
           </button>
         </div>
-      </nav>
 
-      {/* Header */}
-      <header className="page-header">
-        <div>
-          <h1>Product Management</h1>
-          <p>Manage your product catalog</p>
+        {/* Filter Bar */}
+        <div className="flex flex-col md:flex-row gap-4 mb-8">
+          <div className="relative flex-1">
+            <input type="text" placeholder="Scan catalog..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className={`w-full ${theme.input} rounded-2xl py-4 px-12 text-sm font-bold focus:ring-2 focus:ring-amber-500 outline-none transition-all`} />
+            <Search className="absolute left-4 top-4 text-slate-500" size={20} />
+          </div>
+          <div className="relative">
+            <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)} className={`appearance-none w-full md:w-56 ${theme.input} rounded-2xl py-4 px-6 text-[11px] font-black uppercase tracking-widest outline-none`}>
+              <option className={theme.option} value="all">Global Catalog</option>
+              <option className={theme.option} value="Apparel">Apparel</option>
+              <option className={theme.option} value="Electronics">Electronics</option>
+              <option className={theme.option} value="Footwear">Footwear</option>
+            </select>
+            <Layers className="absolute right-4 top-4 text-amber-500 pointer-events-none" size={14} />
+          </div>
         </div>
-        <button className="btn-add" onClick={() => setShowAddForm(true)}>
-          + Add New Product
-        </button>
-      </header>
 
-      {/* Add/Edit Product Modal */}
+        {/* Table Area */}
+        <div className={`${theme.card} rounded-[2rem] border overflow-hidden shadow-2xl`}>
+          <div className="overflow-x-auto">
+            <table className="w-full text-left">
+              <thead>
+                <tr className={`${isDark ? 'bg-white/5 text-slate-500' : 'bg-slate-100 text-slate-400'} text-[10px] font-black uppercase tracking-[0.2em]`}>
+                  <th className="px-6 py-5">Product Matrix</th>
+                  <th className="px-6 py-5">Valuation</th>
+                  <th className="px-6 py-5">Availability</th>
+                  <th className="px-6 py-5 text-right">Ops</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5">
+                {products.map((p) => (
+                  <tr key={p._id} className="hover:bg-amber-500/[0.03] transition-colors group text-sm">
+                    <td className="px-6 py-5">
+                      <div className="flex items-center gap-4">
+                        <img src={p.images[0]} alt="" className="w-12 h-12 rounded-xl object-cover bg-white/5 border border-white/10" />
+                        <div className="min-w-0">
+                          <p className="font-black tracking-tight truncate">{p.name}</p>
+                          <p className="text-[10px] font-bold text-amber-500 uppercase tracking-tighter">{p.brand}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-5">
+                      <p className="font-black tracking-tighter">₹{(p.price * (1 - p.discount / 100)).toLocaleString()}</p>
+                      {p.discount > 0 && <span className="text-[9px] line-through text-slate-500 italic">₹{p.price}</span>}
+                    </td>
+                    <td className="px-6 py-5">
+                      <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-lg ${p.stock > 10 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-red-500/10 text-red-500 animate-pulse'}`}>
+                        {p.stock} Units
+                      </span>
+                    </td>
+                    <td className="px-6 py-5 text-right space-x-2">
+                      <button onClick={() => { setEditingProduct(p); setNewProduct({...p}); setShowAddForm(true); }} className="p-2 text-slate-400 hover:text-amber-500"><Edit3 size={18} /></button>
+                      <button onClick={async () => { if(window.confirm('Purge?')) { await axios.delete(`http://localhost:8000/api/products/admin/${p._id}`, { headers: { Authorization: `Bearer ${Cookies.get('authToken')}` } }); fetchProducts(); } }} className="p-2 text-red-500/30 hover:text-red-500"><Trash2 size={18} /></button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      {/* COMPACT MULTI-STEP MODAL (Prevents Scrollbar) */}
       {showAddForm && (
-        <div className="modal-overlay" onClick={() => { setShowAddForm(false); resetForm(); }}>
-          <div className="modal-box" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{editingProduct ? 'Edit Product' : 'Add New Product'}</h2>
-              <button className="close-btn" onClick={() => { setShowAddForm(false); resetForm(); }}>×</button>
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
+          <div className={`${isDark ? 'bg-[#0f0f0f] border-white/10' : 'bg-white border-slate-200'} border w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 relative overflow-hidden`}>
+            
+            <div className="flex gap-2 mb-8">
+                <div className={`h-1 flex-1 rounded-full transition-all duration-500 ${formStep >= 1 ? 'bg-amber-500' : 'bg-white/10'}`} />
+                <div className={`h-1 flex-1 rounded-full transition-all duration-500 ${formStep === 2 ? 'bg-amber-500' : 'bg-white/10'}`} />
             </div>
 
-            <form onSubmit={handleSubmit} className="product-form">
-              <div className="form-columns">
-                <div className="form-column">
-                  <div className="form-group">
-                    <label>Product Name *</label>
-                    <input type="text" name="name" value={newProduct.name} onChange={handleInputChange} required placeholder="e.g. Cotton T-Shirt" />
+            <button onClick={handleCloseModal} className="absolute right-8 top-12 text-slate-500 hover:text-white transition-colors"><X size={20} /></button>
+            <h2 className="text-xl font-black tracking-tighter mb-6">{editingProduct ? 'Modding System' : 'Init System'} // {formStep === 1 ? 'Identity' : 'Market'}</h2>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {formStep === 1 ? (
+                <div className="space-y-4 animate-in slide-in-from-left-5 duration-300">
+                  <FormInput label="Identifier Name" name="name" value={newProduct.name} onChange={handleInputChange} required />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormInput label="Brand" name="brand" value={newProduct.brand} onChange={handleInputChange} required />
+                    <FormInput label="Author" name="author" value={newProduct.author} onChange={handleInputChange} />
                   </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Brand *</label>
-                      <input type="text" name="brand" value={newProduct.brand} onChange={handleInputChange} required />
-                    </div>
-                    <div className="form-group">
-                      <label>Author</label>
-                      <input type="text" name="author" value={newProduct.author} onChange={handleInputChange} />
-                    </div>
+                  <div>
+                    <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">Image Stream</label>
+                    <textarea value={newProduct.images.join('\n')} onChange={(e) => setNewProduct(prev => ({ ...prev, images: e.target.value.split('\n').filter(url => url.trim()) }))} rows="2" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs font-bold outline-none text-white scrollbar-hide" required placeholder="Paste URLs per line..." />
                   </div>
-
-                  <div className="form-group">
-                    <label>Description *</label>
-                    <textarea name="description" value={newProduct.description} onChange={handleInputChange} rows="4" required />
+                  <button type="button" onClick={() => setFormStep(2)} className="w-full flex items-center justify-center gap-2 bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-black py-4 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all">
+                    Phase 02 <ChevronRight size={14} strokeWidth={3} />
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4 animate-in slide-in-from-right-5 duration-300">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormSelect label="Category" name="category" value={newProduct.category} onChange={handleInputChange} options={['Apparel', 'Electronics', 'Footwear', 'Accessories']} />
+                    <FormSelect label="Gender" name="gender" value={newProduct.gender} onChange={handleInputChange} options={['Male', 'Female', 'Unisex']} />
                   </div>
-
-                  <div className="form-group">
-                    <label>Image URLs (one per line) *</label>
-                    <textarea
-                      value={newProduct.images.join('\n')}
-                      onChange={(e) => setNewProduct(prev => ({ ...prev, images: e.target.value.split('\n').filter(url => url.trim()) }))}
-                      rows="4"
-                      placeholder="https://example.com/image1.jpg"
-                      required
-                    />
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormInput label="Base (₹)" type="number" name="price" value={newProduct.price} onChange={handleInputChange} required />
+                    <FormInput label="Stock" type="number" name="stock" value={newProduct.stock} onChange={handleInputChange} required />
+                  </div>
+                  <div className="flex gap-3 pt-4">
+                    <button type="button" onClick={() => setFormStep(1)} className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-white/5 border-white/10 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'}`}><ChevronLeft size={20} /></button>
+                    <button type="submit" className="flex-1 bg-amber-500 text-black py-4 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-400 shadow-lg shadow-amber-500/20 active:scale-95 transition-all">
+                      {editingProduct ? 'Update Core' : 'Execute Entry'}
+                    </button>
                   </div>
                 </div>
-
-                <div className="form-column">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Category *</label>
-                      <select name="category" value={newProduct.category} onChange={handleInputChange} required>
-                        <option value="Apparel">Apparel</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Footwear">Footwear</option>
-                        <option value="Accessories">Accessories</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Gender *</label>
-                      <select name="gender" value={newProduct.gender} onChange={handleInputChange} required>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Unisex">Unisex</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label>Price (₹) *</label>
-                      <input type="number" name="price" value={newProduct.price} onChange={handleInputChange} required />
-                    </div>
-                    <div className="form-group">
-                      <label>Discount (%)</label>
-                      <input type="number" name="discount" value={newProduct.discount} onChange={handleInputChange} />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Stock *</label>
-                    <input type="number" name="stock" value={newProduct.stock} onChange={handleInputChange} required />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Sizes (comma separated)</label>
-                    <input type="text" value={newProduct.sizes.join(', ')} onChange={(e) => handleArrayChange(e, 'sizes')} placeholder="S, M, L, XL" />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Colors (comma separated)</label>
-                    <input type="text" value={newProduct.colors.join(', ')} onChange={(e) => handleArrayChange(e, 'colors')} placeholder="Black, White, Blue" />
-                  </div>
-                </div>
-              </div>
-
-              <div className="form-actions">
-                <button type="button" className="btn-cancel" onClick={() => { setShowAddForm(false); resetForm(); }}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn-submit">
-                  {editingProduct ? 'Update Product' : 'Add Product'}
-                </button>
-              </div>
+              )}
             </form>
           </div>
         </div>
       )}
-
-      {/* Search and Filter */}
-      <div className="controls-bar">
-        <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <circle cx="11" cy="11" r="8"/>
-            <path d="m21 21-4.35-4.35"/>
-          </svg>
-        </div>
-        <select value={categoryFilter} onChange={(e) => setCategoryFilter(e.target.value)}>
-          <option value="all">All Categories</option>
-          <option value="Apparel">Apparel</option>
-          <option value="Electronics">Electronics</option>
-          <option value="Footwear">Footwear</option>
-          <option value="Accessories">Accessories</option>
-        </select>
-      </div>
-
-      {/* Products Table */}
-      <div className="table-container">
-        {products.length === 0 ? (
-          <div className="empty-state">
-            <p>No products found</p>
-          </div>
-        ) : (
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Gender</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product._id}>
-                  <td>
-                    <div className="product-cell">
-                      <img src={product.images[0]} alt={product.name} className="product-img" />
-                      <div>
-                        <p className="product-name">{product.name}</p>
-                        <p className="product-brand">{product.brand}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{product.category}</td>
-                  <td>{product.gender}</td>
-                  <td>
-                    <div className="price-cell">
-                      <span className="final-price">₹{(product.price * (1 - product.discount / 100)).toFixed(2)}</span>
-                      {product.discount > 0 && <span className="original-price">₹{product.price}</span>}
-                    </div>
-                  </td>
-                  <td>
-                    <span className={`stock-badge ${product.stock > 10 ? 'in-stock' : 'low-stock'}`}>
-                      {product.stock} units
-                    </span>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <button className="btn-edit" onClick={() => handleEdit(product)}>Edit</button>
-                      <button className="btn-delete" onClick={() => handleDelete(product._id, product.name)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
     </div>
   );
 };
+
+const FormInput = ({ label, type = "text", ...props }) => (
+  <div>
+    <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">{label}</label>
+    <input type={type} {...props} className="w-full bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs font-bold outline-none text-white focus:border-amber-500 transition-all" />
+  </div>
+);
+
+const FormSelect = ({ label, options, ...props }) => (
+  <div>
+    <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">{label}</label>
+    <select {...props} className="w-full bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs font-black uppercase outline-none text-amber-500 appearance-none">
+      {options.map(opt => <option key={opt} value={opt} className="bg-[#1a1a1a]">{opt}</option>)}
+    </select>
+  </div>
+);
 
 export default AdminProducts;
