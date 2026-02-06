@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@1,500&family=Inter:wght@300;400;700&display=swap');
+
+:root {
+  --gold: #b39359;
+  --dark: #1a1a1a;
+  --soft-white: #fafafa;
+  --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  background-color: var(--soft-white);
+  display: flex;
+  flex-direction: column;
+  /* Crucial: Prevents the massive watermark from breaking the layout width */
+  overflow: hidden; 
+  font-family: 'Inter', sans-serif;
+}
+
+/* --- Watermark --- */
+.bg-watermark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 40vw; 
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.03);
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+
+/* --- Layout Grid --- */
+.hero-wrapper {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 100px 6% 40px; /* Reduced top padding for mobile */
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* --- Typography --- */
+.hero-text-side {
+  max-width: 100%;
+  text-align: center;
+}
+
+.hero-tagline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  letter-spacing: 0.3em;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--dark);
+  margin-bottom: 1rem;
+}
+
+.hero-tagline .line {
+  width: 20px;
+  height: 1px;
+  background-color: var(--gold);
+}
+
+.hero-heading {
+  /* Clamp ensures it never gets too small or too large */
+  font-size: clamp(2.5rem, 10vw, 6.5rem); 
+  line-height: 1.1;
+  color: var(--dark);
+  margin-bottom: 1.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.italic-gold {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  color: var(--gold);
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.hero-desc {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #555;
+  max-width: 400px;
+  margin: 0 auto 2.5rem;
+}
+
+/* --- Buttons --- */
+.hero-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  align-items: center;
+}
+
+.cta-primary {
+  width: 100%;
+  max-width: 280px;
+  padding: 20px;
+  background-color: var(--dark);
+  color: white;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cta-primary:hover {
+  background-color: var(--gold);
+  transform: translateY(-3px);
+}
+
+.cta-link {
+  background: none;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  cursor: pointer;
+  color: var(--dark);
+  padding: 10px;
+}
+
+/* --- Visual Side (Mobile: Small & Centered) --- */
+.hero-visual-side {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 3rem;
+}
+
+.abstract-element {
+  position: relative;
+  width: 200px; /* Small blob for mobile */
+  height: 200px;
+}
+
+.floating-blob {
+  width: 100%;
+  height: auto;
+  opacity: 0.15;
+  filter: grayscale(1);
+  animation: rotateBlob 25s linear infinite;
+}
+
+/* --- Footer --- */
+.hero-footer {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 15px;
+  padding: 30px 6%;
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,0.05);
+  z-index: 5;
+}
+
+.stat-item {
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #888;
+  text-align: center;
+}
+
+.stat-item span {
+  color: var(--dark);
+  font-weight: 700;
+}
+
+/* --- MEDIA QUERIES --- */
+
+/* Tablet (768px+) */
+@media (min-width: 768px) {
+  .hero-btns {
+    flex-direction: row;
+    justify-content: center;
+  }
+  
+  .cta-primary {
+    width: auto;
+    padding: 18px 40px;
+  }
+
+  .hero-footer {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .abstract-element {
+    width: 300px;
+  }
+}
+
+/* Desktop (1024px+) */
+@media (min-width: 1024px) {
+  .hero-wrapper {
+    grid-template-columns: 1.1fr 0.9fr;
+    text-align: left;
+    padding: 0 10%;
+  }
+
+  .hero-text-side {
+    text-align: left;
+  }
+
+  .hero-tagline {
+    justify-content: flex-start;
+  }
+
+  .hero-desc {
+    margin: 0 0 3rem 0;
+    font-size: 1.1rem;
+  }
+
+  .hero-btns {
+    justify-content: flex-start;
+  }
+
+  .hero-visual-side {
+    margin-top: 0;
+  }
+
+  .abstract-element {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .gold-accent-line {
+    position: absolute;
+    top: 50%;
+    left: -10%;
+    width: 120%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    z-index: 1;
+  }
+}
+
+@keyframes rotateBlob {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

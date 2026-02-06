@@ -1,0 +1,308 @@
+/* LoginPage.css */
+
+.login-container {
+    height: 100vh;
+    height: 100svh;
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    background: var(--bg-main);
+}
+
+.login-split-layout {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    height: 100%;
+    width: 100%;
+}
+
+/* Back Button */
+.nav-back-btn {
+    position: absolute;
+    top: 2rem;
+    left: 2rem;
+    z-index: 10;
+    background: white;
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 700;
+    transition: var(--transition);
+}
+
+.nav-back-btn:hover {
+    background: var(--text-main);
+    color: white;
+}
+
+/* Visual Panel */
+.login-visual-panel {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+}
+
+.visual-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.visual-overlay {
+    position: absolute;
+    bottom: 4rem;
+    left: 4rem;
+    z-index: 2;
+    color: white;
+}
+
+/* Content Panel */
+.login-content-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    height: 100%;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 360px;
+    display: flex;
+    flex-direction: column;
+    /* This prevents the form from growing beyond the screen height */
+    max-height: 100%;
+}
+
+/* Typography & Spacing */
+.brand-label {
+    color: var(--accent-gold);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.brand-label-alt {
+    composes: brand-label;
+    color: white;
+    opacity: 0.8;
+}
+
+.main-title {
+    font-size: clamp(1.5rem, 5vh, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.1;
+    margin-bottom: clamp(1rem, 4vh, 2.5rem);
+}
+
+.visual-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+/* Form Elements */
+.input-group {
+    margin-bottom: clamp(0.8rem, 2vh, 1.2rem);
+}
+
+.input-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+    display: block;
+    letter-spacing: 1px;
+}
+
+.form-input {
+    width: 100%;
+    height: clamp(42px, 5vh, 50px);
+    border: 1px solid var(--border-color);
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    background: #fafafa;
+    transition: var(--transition);
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--text-main);
+    background: white;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: clamp(1.5rem, 4vh, 2.5rem);
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-text {
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-main);
+}
+
+.forgot-link {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-decoration: none;
+}
+
+/* Buttons */
+.button-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.btn {
+    width: 100%;
+    height: clamp(48px, 6vh, 54px);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: var(--transition);
+    border: 1px solid var(--text-main);
+}
+
+.btn-primary {
+    background: var(--text-main);
+    color: white;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-main);
+}
+
+.btn-secondary:hover {
+    background: var(--text-main);
+    color: white;
+}
+
+.form-footer {
+    margin-top: clamp(1rem, 3vh, 2rem);
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.form-footer p {
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Responsive Overrides */
+@media (max-width: 900px) {
+    .login-container {
+        overflow-y: auto;
+        height: auto;
+    }
+
+    .login-split-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .login-visual-panel {
+        height: 35vh;
+    }
+
+    .visual-title {
+        font-size: 1.8rem;
+    }
+
+    .login-content-panel {
+        height: auto;
+        padding: 3rem 1.5rem;
+    }
+
+    .nav-back-btn {
+        top: 1rem;
+        left: 1rem;
+    }
+}
+
+/* Short Screen Fix (iPhone SE / Small Laptops) */
+@media (max-height: 650px) {
+    .main-title {
+        margin-bottom: 0.5rem;
+    }
+
+    .form-options {
+        margin-bottom: 1rem;
+    }
+
+    .form-footer {
+        display: none;
+    }
+
+    /* Hide footer on very small height to save space */
+}
+
+.visual-overlay-signup {
+    position: absolute;
+    bottom: 4rem;
+    left: 4rem;
+    z-index: 2;
+    color: black;
+}
+
+.admin-notice {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+}
+
+.admin-badge {
+    display: inline-block;
+    background-color: #3b82f6;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.admin-notice-text {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #374151;
+}
+
+.admin-hint {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+    margin-top: 8px;
+    font-weight: 500;
+}

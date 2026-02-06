@@ -1,0 +1,491 @@
+/* ProductDetail.css */
+
+:root {
+  --bg-main: #ffffff;
+  --text-main: #121212;
+  --text-muted: #888888;
+  --accent-gold: #c5a059;
+  --border-color: #eeeeee;
+  --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* Base Container */
+.PDP-Hero-Container {
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  background: var(--bg-main);
+}
+
+/* Navigation */
+.PDP-BackBtn {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+  z-index: 100;
+  background: white;
+  border: 1px solid var(--border-color);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  transition: var(--transition);
+}
+
+.PDP-BackBtn:hover {
+  background: var(--text-main);
+  color: white;
+}
+
+/* Layout Grid */
+.PDP-Split-Layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  width: 100%;
+}
+
+/* Left Side: Image Section (Shows full image, no crop) */
+.PDP-Image-Section {
+  height: 100vh;
+  /* background: #f4f4f4; */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 40px;
+  /* Safe zone padding */
+}
+
+.PDP-Image-Section img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: var(--transition);
+}
+
+/* Right Side: Content Section (Compressed for 100vh) */
+.PDP-Content-Section {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* Centers content block vertically */
+  padding: 0 10%;
+  overflow: hidden;
+  /* Prevents scrolling */
+}
+
+.PDP-Content-Wrapper {
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Typography */
+.PDP-Brand-Label {
+  color: var(--accent-gold);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.PDP-Main-Title {
+  font-size: clamp(1.8rem, 3.5vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  margin-bottom: 12px;
+}
+
+.PDP-Price-Group {
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.PDP-Current-Price {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.PDP-Old-Price {
+  text-decoration: line-through;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.PDP-Brief {
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+}
+
+/* Product Controls */
+.PDP-Sub-Label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.PDP-Size-Grid {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.PDP-Size-Button {
+  flex: 1;
+  height: 45px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.PDP-Size-Button.active {
+  background: var(--text-main);
+  color: white;
+  border-color: var(--text-main);
+}
+
+.PDP-Quantity-Row {
+  margin-bottom: 25px;
+}
+
+.PDP-Quantity-Selector {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  height: 42px;
+  padding: 0 5px;
+}
+
+.PDP-Quantity-Selector button {
+  background: none;
+  border: none;
+  width: 30px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.PDP-Quantity-Selector span {
+  width: 30px;
+  text-align: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+/* Buttons */
+.PDP-Action-Stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.PDP-Add-Cart-Btn,
+.PDP-Direct-Buy-Btn {
+  width: 100%;
+  height: 52px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.PDP-Add-Cart-Btn {
+  background: var(--text-main);
+  color: white;
+  border: none;
+}
+
+.PDP-Add-Cart-Btn:hover {
+  background: #333;
+}
+
+.PDP-Direct-Buy-Btn {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--text-main);
+}
+
+.PDP-Direct-Buy-Btn:hover {
+  background: var(--text-main);
+  color: white;
+}
+
+/* Footer */
+.PDP-Meta-Footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 15px;
+}
+
+.PDP-Meta-Footer p {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 4px;
+}
+
+/* Small Laptop Fix (Targets shorter heights) */
+@media (max-height: 750px) {
+  .PDP-Content-Wrapper {
+    padding: 10px 0;
+  }
+
+  .PDP-Main-Title {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+  }
+
+  .PDP-Brief {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    margin-bottom: 15px;
+  }
+
+  .PDP-Action-Stack {
+    gap: 8px;
+  }
+
+  .PDP-Add-Cart-Btn,
+  .PDP-Direct-Buy-Btn {
+    height: 45px;
+  }
+}
+
+/* Tablet/Mobile Fix */
+@media (max-width: 900px) {
+  .PDP-Hero-Container {
+    height: auto;
+    overflow: visible;
+  }
+
+  .PDP-Split-Layout {
+    grid-template-columns: 1fr;
+  }
+
+  .PDP-Image-Section {
+    height: 65vh;
+    padding: 20px;
+  }
+
+  .PDP-Content-Section {
+    height: auto;
+    padding: 40px 8%;
+  }
+
+  .PDP-BackBtn {
+    top: 20px;
+    left: 20px;
+  }
+}
+
+/* Add to ProductDetail.css */
+
+/* Discount Badge */
+.PDP-Discount-Badge {
+  background: #ff4444;
+  color: white;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  border-radius: 4px;
+  letter-spacing: 1px;
+}
+
+/* Stock Status */
+.PDP-Stock-Status {
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.PDP-Stock-Status .in-stock {
+  color: #22c55e;
+}
+
+.PDP-Stock-Status .out-of-stock {
+  color: #ef4444;
+}
+
+/* Color Grid */
+.PDP-Color-Grid {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.PDP-Color-Button {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.PDP-Color-Button:hover {
+  transform: scale(1.1);
+}
+
+/* Product Info */
+.PDP-Product-Info {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  padding: 15px 0;
+  margin-bottom: 15px;
+}
+
+.PDP-Product-Info p {
+  font-size: 0.75rem;
+  margin-bottom: 6px;
+  color: #555;
+}
+
+/* Disabled Button States */
+.PDP-Add-Cart-Btn:disabled,
+.PDP-Direct-Buy-Btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.PDP-Quantity-Selector button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Loading State */
+.PDP-Add-Cart-Btn.loading {
+  position: relative;
+  color: transparent;
+}
+
+.PDP-Add-Cart-Btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Add to ProductDetail.css */
+
+/* Loading State */
+.PDP-Loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+.PDP-Spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--text-main);
+  border-radius: 50%;
+  animation: pdp-spin 0.8s linear infinite;
+}
+
+@keyframes pdp-spin {
+  to { transform: rotate(360deg); }
+}
+
+.PDP-Loading p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* Error State */
+.PDP-Error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  text-align: center;
+  padding: 40px;
+}
+
+.PDP-Error-Icon {
+  margin-bottom: 25px;
+  color: var(--error-red);
+}
+
+.PDP-Error h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: var(--text-main);
+}
+
+.PDP-Error p {
+  color: var(--text-muted);
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+  max-width: 400px;
+}
+
+.PDP-Error-Btn {
+  padding: 14px 40px;
+  background: var(--text-main);
+  color: white;
+  border: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.PDP-Error-Btn:hover {
+  background: #333;
+}

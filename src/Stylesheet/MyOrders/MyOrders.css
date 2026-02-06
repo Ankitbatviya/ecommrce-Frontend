@@ -1,0 +1,457 @@
+/* Stylesheet/MyOrders/MyOrders.css */
+
+.MyOrders-Container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: 70vh;
+}
+
+.MyOrders-Header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.MyOrders-Header h1 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 15px;
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.MyOrders-Header p {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.MyOrders-Loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.MyOrders-Spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--border-color);
+  border-top-color: var(--text-main);
+  border-radius: 50%;
+  animation: myorders-spin 0.8s linear infinite;
+}
+
+@keyframes myorders-spin {
+  to { transform: rotate(360deg); }
+}
+
+.MyOrders-Empty {
+  text-align: center;
+  padding: 80px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.MyOrders-Empty-Icon {
+  color: var(--border-color);
+  margin-bottom: 30px;
+}
+
+.MyOrders-Empty h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: var(--text-muted);
+}
+
+.MyOrders-Empty p {
+  color: var(--text-light);
+  margin-bottom: 30px;
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.MyOrders-Shop-Btn {
+  padding: 14px 40px;
+  background: var(--text-main);
+  color: white;
+  border: none;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.MyOrders-Shop-Btn:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+.MyOrders-List {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.MyOrders-Card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.MyOrders-Card:hover {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transform: translateY(-3px);
+}
+
+.MyOrders-Card-Header {
+  padding: 25px 30px;
+  border-bottom: 1px solid var(--border-color);
+  background: #fafafa;
+}
+
+.MyOrders-Order-Info {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.MyOrders-Order-Info > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.MyOrders-Order-Info strong {
+  font-size: 1.3rem;
+  color: var(--text-main);
+}
+
+.MyOrders-Date {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.MyOrders-Price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.MyOrders-Status-Info {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.MyOrders-Status-Badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.MyOrders-Payment-Method {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.MyOrders-Items-Preview {
+  padding: 25px 30px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.MyOrders-Preview-Item {
+  display: grid;
+  grid-template-columns: 70px 1fr auto;
+  gap: 20px;
+  padding: 15px 0;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.MyOrders-Preview-Item:last-child {
+  border-bottom: none;
+}
+
+.MyOrders-Preview-Item img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.MyOrders-Preview-Info h4 {
+  font-weight: 600;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+.MyOrders-Preview-Info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 3px;
+}
+
+.MyOrders-Preview-Price {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--text-main);
+}
+
+.MyOrders-More-Items {
+  text-align: center;
+  padding: 15px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  background: #f9f9f9;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.MyOrders-Actions {
+  padding: 25px 30px;
+  display: flex;
+  gap: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.MyOrders-View-Btn,
+.MyOrders-Cancel-Btn,
+.MyOrders-Return-Btn {
+  padding: 12px 30px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.MyOrders-View-Btn {
+  background: var(--text-main);
+  color: white;
+}
+
+.MyOrders-View-Btn:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+.MyOrders-Cancel-Btn {
+  background: transparent;
+  color: #f44336;
+  border: 1px solid #f44336;
+}
+
+.MyOrders-Cancel-Btn:hover:not(:disabled) {
+  background: #f44336;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.MyOrders-Cancel-Btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.MyOrders-Return-Btn {
+  background: transparent;
+  color: #2196f3;
+  border: 1px solid #2196f3;
+}
+
+.MyOrders-Return-Btn:hover {
+  background: #2196f3;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.MyOrders-Cancel-Form {
+  padding: 25px 30px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.MyOrders-Cancel-Form textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  resize: vertical;
+  margin-bottom: 15px;
+  transition: var(--transition);
+}
+
+.MyOrders-Cancel-Form textarea:focus {
+  outline: none;
+  border-color: var(--text-main);
+  box-shadow: 0 0 0 2px rgba(0,0,0,0.1);
+}
+
+.MyOrders-Cancel-Actions {
+  display: flex;
+  gap: 15px;
+}
+
+.MyOrders-Confirm-Cancel,
+.MyOrders-Cancel-Cancel {
+  padding: 12px 30px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.MyOrders-Confirm-Cancel {
+  background: #f44336;
+  color: white;
+}
+
+.MyOrders-Confirm-Cancel:hover:not(:disabled) {
+  background: #d32f2f;
+  transform: translateY(-2px);
+}
+
+.MyOrders-Confirm-Cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.MyOrders-Cancel-Cancel {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color);
+}
+
+.MyOrders-Cancel-Cancel:hover {
+  background: var(--border-color);
+}
+
+.MyOrders-Tracking {
+  padding: 25px 30px;
+}
+
+.MyOrders-Tracking-Steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.MyOrders-Step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+}
+
+.MyOrders-Step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: 12px;
+  right: -50%;
+  width: 100%;
+  height: 2px;
+  background: var(--border-color);
+  z-index: 1;
+}
+
+.MyOrders-Step.active:not(:last-child)::after {
+  background: var(--accent-gold);
+}
+
+.MyOrders-Step-Dot {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--border-color);
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 2;
+}
+
+.MyOrders-Step.active .MyOrders-Step-Dot {
+  background: var(--accent-gold);
+  box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+}
+
+.MyOrders-Step span {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.MyOrders-Step.active span {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .MyOrders-Container {
+    padding: 20px 15px;
+  }
+
+  .MyOrders-Header h1 {
+    font-size: 2rem;
+  }
+
+  .MyOrders-Order-Info {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .MyOrders-Status-Info {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .MyOrders-Preview-Item {
+    grid-template-columns: 60px 1fr;
+  }
+
+  .MyOrders-Preview-Price {
+    grid-column: 1 / -1;
+    text-align: right;
+  }
+
+  .MyOrders-Actions {
+    flex-direction: column;
+  }
+
+  .MyOrders-Tracking-Steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .MyOrders-Step:not(:last-child)::after {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .MyOrders-Tracking-Steps {
+    grid-template-columns: 1fr;
+  }
+}

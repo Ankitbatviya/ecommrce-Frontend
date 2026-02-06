@@ -1,0 +1,665 @@
+/* Stylesheet/OrderDetail/OrderDetail.css */
+
+.OrderDetail-Container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  min-height: 80vh;
+}
+
+/* Loading State */
+.OrderDetail-Loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 20px;
+}
+
+.OrderDetail-Spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid var(--border-color);
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: orderdetail-spin 1s linear infinite;
+}
+
+@keyframes orderdetail-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Not Found State */
+.OrderDetail-NotFound {
+  text-align: center;
+  padding: 80px 20px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.OrderDetail-NotFound h2 {
+  font-size: 2rem;
+  color: var(--text-main);
+  margin-bottom: 20px;
+}
+
+.OrderDetail-NotFound p {
+  color: var(--text-muted);
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* Header */
+.OrderDetail-Header {
+  margin-bottom: 40px;
+}
+
+.OrderDetail-Breadcrumb {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+
+.OrderDetail-Breadcrumb a {
+  color: var(--text-main);
+  text-decoration: none;
+  margin: 0 5px;
+  transition: var(--transition);
+}
+
+.OrderDetail-Breadcrumb a:hover {
+  color: var(--accent-gold);
+}
+
+.OrderDetail-Breadcrumb span {
+  color: var(--accent-gold);
+  margin-left: 5px;
+  font-weight: 600;
+}
+
+.OrderDetail-TitleSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.OrderDetail-TitleSection h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.OrderDetail-StatusBadge {
+  padding: 8px 20px;
+  border-radius: 25px;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.OrderDetail-OrderInfo {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  background: #f9f9f9;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-gold);
+}
+
+/* Main Grid Layout */
+.OrderDetail-Grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 40px;
+  margin-bottom: 50px;
+}
+
+@media (max-width: 1024px) {
+  .OrderDetail-Grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Order Items Section */
+.OrderDetail-Section {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.OrderDetail-Section h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.OrderDetail-ItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.OrderDetail-Item {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 25px;
+  padding: 25px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.OrderDetail-Item:hover {
+  border-color: var(--accent-gold);
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.1);
+}
+
+@media (max-width: 768px) {
+  .OrderDetail-Item {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.OrderDetail-ItemImage {
+  width: 120px;
+  height: 120px;
+}
+
+.OrderDetail-ItemImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.OrderDetail-ItemDetails {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.OrderDetail-ItemDetails h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.OrderDetail-ItemAttributes {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.OrderDetail-Attribute {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.OrderDetail-Attribute strong {
+  color: var(--text-main);
+  margin-right: 5px;
+}
+
+.OrderDetail-ViewProduct {
+  color: var(--accent-gold);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: inline-block;
+  transition: var(--transition);
+}
+
+.OrderDetail-ViewProduct:hover {
+  color: var(--text-main);
+  text-decoration: underline;
+}
+
+.OrderDetail-ItemPrice {
+  text-align: right;
+  min-width: 150px;
+}
+
+@media (max-width: 768px) {
+  .OrderDetail-ItemPrice {
+    text-align: left;
+  }
+}
+
+.OrderDetail-PriceRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.OrderDetail-TotalRow {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}
+
+/* Sidebar */
+.OrderDetail-Sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+}
+
+.OrderDetail-SummaryCard {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.OrderDetail-SummaryCard h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.OrderDetail-SummaryRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.OrderDetail-GrandTotal {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid var(--border-color);
+}
+
+.OrderDetail-Address {
+  line-height: 1.6;
+}
+
+.OrderDetail-Address p {
+  margin-bottom: 8px;
+  color: var(--text-muted);
+}
+
+.OrderDetail-Address strong {
+  color: var(--text-main);
+}
+
+.OrderDetail-Phone,
+.OrderDetail-Email {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--border-color);
+}
+
+.OrderDetail-Notes {
+  color: var(--text-muted);
+  line-height: 1.6;
+  font-style: italic;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid var(--accent-gold);
+}
+
+.OrderDetail-CancelledInfo {
+  background: #fff5f5;
+  border: 1px solid #fed7d7;
+}
+
+.OrderDetail-CancelledInfo h3 {
+  color: #c53030;
+  border-bottom-color: #fed7d7;
+}
+
+/* Action Buttons */
+.OrderDetail-Actions {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.OrderDetail-Btn {
+  padding: 14px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.OrderDetail-Btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.OrderDetail-CancelBtn {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1px solid #fed7d7;
+}
+
+.OrderDetail-CancelBtn:hover:not(:disabled) {
+  background: #c53030;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.OrderDetail-TrackBtn {
+  background: #f0f9ff;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
+}
+
+.OrderDetail-TrackBtn:hover:not(:disabled) {
+  background: #0369a1;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.OrderDetail-InvoiceBtn {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.OrderDetail-InvoiceBtn:hover:not(:disabled) {
+  background: #166534;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.OrderDetail-BackBtn {
+  background: #f8fafc;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.OrderDetail-BackBtn:hover:not(:disabled) {
+  background: var(--text-main);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.OrderDetail-ShopBtn {
+  background: var(--accent-gold);
+  color: white;
+  border: 1px solid var(--accent-gold);
+}
+
+.OrderDetail-ShopBtn:hover:not(:disabled) {
+  background: #b8941f;
+  transform: translateY(-2px);
+}
+
+/* Cancel Order Modal */
+.OrderDetail-Modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.OrderDetail-ModalContent {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  max-width: 500px;
+  width: 100%;
+  animation: modal-slide 0.3s ease-out;
+}
+
+@keyframes modal-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.OrderDetail-ModalContent h3 {
+  font-size: 1.5rem;
+  color: var(--text-main);
+  margin-bottom: 10px;
+}
+
+.OrderDetail-ModalContent > p {
+  color: var(--text-muted);
+  margin-bottom: 25px;
+  line-height: 1.6;
+}
+
+.OrderDetail-CancelForm label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: var(--text-main);
+}
+
+.OrderDetail-CancelForm textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: vertical;
+  margin-bottom: 10px;
+  transition: var(--transition);
+}
+
+.OrderDetail-CancelForm textarea:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+}
+
+.OrderDetail-CharCount {
+  display: block;
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.OrderDetail-ModalActions {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.OrderDetail-ConfirmCancelBtn {
+  background: #c53030;
+  color: white;
+  flex: 1;
+}
+
+.OrderDetail-ConfirmCancelBtn:hover:not(:disabled) {
+  background: #9b2c2c;
+}
+
+.OrderDetail-CancelModalBtn {
+  background: var(--border-color);
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.OrderDetail-CancelModalBtn:hover:not(:disabled) {
+  background: #d1d5db;
+}
+
+/* Timeline Section */
+.OrderDetail-TimelineSection {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.OrderDetail-TimelineSection h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.OrderDetail-Timeline {
+  position: relative;
+  padding-left: 30px;
+}
+
+.OrderDetail-Timeline::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--border-color);
+}
+
+.OrderDetail-TimelineStep {
+  position: relative;
+  margin-bottom: 30px;
+  padding-left: 30px;
+}
+
+.OrderDetail-TimelineStep:last-child {
+  margin-bottom: 0;
+}
+
+.OrderDetail-TimelineDot {
+  position: absolute;
+  left: -15px;
+  top: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--border-color);
+  border: 3px solid white;
+  z-index: 2;
+}
+
+.OrderDetail-TimelineStep.active .OrderDetail-TimelineDot {
+  background: var(--accent-gold);
+  box-shadow: 0 0 0 5px rgba(212, 175, 55, 0.2);
+}
+
+.OrderDetail-CancelledStep .OrderDetail-TimelineDot {
+  background: #c53030;
+}
+
+.OrderDetail-TimelineContent h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 5px;
+}
+
+.OrderDetail-TimelineContent p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.OrderDetail-TimelineStep.active .OrderDetail-TimelineContent h4 {
+  color: var(--accent-gold);
+}
+
+.OrderDetail-CancelledStep .OrderDetail-TimelineContent h4 {
+  color: #c53030;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .OrderDetail-Container {
+    padding: 20px 15px;
+  }
+
+  .OrderDetail-TitleSection h1 {
+    font-size: 2rem;
+  }
+
+  .OrderDetail-Section,
+  .OrderDetail-SummaryCard {
+    padding: 20px;
+  }
+
+  .OrderDetail-Item {
+    padding: 20px;
+  }
+
+  .OrderDetail-Btn {
+    padding: 12px 15px;
+    font-size: 0.85rem;
+  }
+
+  .OrderDetail-ModalContent {
+    padding: 20px;
+  }
+
+  .OrderDetail-ModalActions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .OrderDetail-TitleSection {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .OrderDetail-OrderInfo {
+    font-size: 0.85rem;
+    padding: 12px 15px;
+  }
+
+  .OrderDetail-ItemAttributes {
+    flex-direction: column;
+    gap: 10px;
+  }
+}

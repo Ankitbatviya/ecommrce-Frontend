@@ -1,0 +1,144 @@
+/* Namespace Wrapper */
+.couture-service-section {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-main);
+    padding: 40px 20px;
+    box-sizing: border-box;
+    /* Ensures padding doesn't break width */
+}
+
+/* Scoped Layout */
+.couture-service-section .service-wrapper {
+    width: 100%;
+    max-width: 1300px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+/* Scoped Left Box */
+.couture-service-section .service-left-full {
+    background: var(--bg-secondary);
+    background-image: linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2)),
+        url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    padding: 40px;
+    min-height: 450px;
+}
+
+.couture-service-section .service-label-tag {
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--accent-gold);
+    font-weight: 700;
+    display: block;
+}
+
+.couture-service-section .service-main-title {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    color: var(--text-main);
+    line-height: 1.1;
+    margin: 15px 0;
+}
+
+/* Scoped Right Stack */
+.couture-service-section .service-right-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.couture-service-section .brand-header-box {
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius);
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.couture-service-section .service-crown-icon {
+    width: 60px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.couture-service-section .contact-action-box {
+    background-color: var(--accent-soft);
+    border-radius: var(--radius);
+    padding: 40px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    text-align: center;
+}
+
+/* Scoped Buttons */
+.couture-service-section .service-primary-btn,
+.couture-service-section .service-ghost-btn {
+    width: 100%;
+    max-width: 250px;
+    padding: 16px 32px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+}
+
+.couture-service-section .service-primary-btn {
+    background: var(--text-main);
+    color: #fff;
+    border: none;
+}
+
+.couture-service-section .service-ghost-btn {
+    background: transparent;
+    border: 1px solid var(--text-main);
+}
+
+/* --- Responsive States --- */
+
+@media (min-width: 1024px) {
+    .couture-service-section {
+        height: 100vh;
+        padding: 0;
+    }
+
+    .couture-service-section .service-wrapper {
+        height: 85vh;
+        grid-template-columns: 1.1fr 1fr;
+    }
+
+    .couture-service-section .contact-action-box {
+        flex-direction: row;
+        justify-content: space-between;
+        text-align: left;
+    }
+
+    .couture-service-section .service-primary-btn,
+    .couture-service-section .service-ghost-btn {
+        width: auto;
+    }
+
+    .couture-service-section .brand-header-box {
+        flex: 1.4;
+    }
+
+    .couture-service-section .contact-action-box {
+        flex: 1;
+    }
+}

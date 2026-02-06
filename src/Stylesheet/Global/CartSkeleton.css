@@ -1,0 +1,395 @@
+/* CartSkeleton.css */
+.cart-skeleton {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Header */
+.skeleton-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.skeleton-title {
+  height: 32px;
+  width: 200px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin: 0 auto 1rem;
+}
+
+.skeleton-count {
+  height: 20px;
+  width: 150px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin: 0 auto;
+}
+
+/* Cart Container */
+.skeleton-cart-container {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 2rem;
+}
+
+/* Items Section */
+.skeleton-items-section {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-items-header {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 60px;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-header-item {
+  height: 20px;
+  width: 80px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Cart Item */
+.skeleton-cart-item {
+  display: grid;
+  grid-template-columns: 100px 2fr 1fr 1fr 60px;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+.skeleton-item-image {
+  height: 100px;
+  width: 100px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 8px;
+}
+
+.skeleton-item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.skeleton-item-name {
+  height: 20px;
+  width: 180px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-item-category {
+  height: 16px;
+  width: 100px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-item-options {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.skeleton-option {
+  height: 24px;
+  width: 60px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-item-price {
+  height: 20px;
+  width: 80px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-item-quantity {
+  display: flex;
+  align-items: center;
+}
+
+.skeleton-quantity-control {
+  height: 40px;
+  width: 120px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-item-total {
+  text-align: right;
+}
+
+.skeleton-total-price {
+  height: 24px;
+  width: 80px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-left: auto;
+}
+
+.skeleton-item-remove {
+  height: 32px;
+  width: 32px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 50%;
+}
+
+/* Summary Section */
+.skeleton-summary-section {
+  position: sticky;
+  top: 2rem;
+  align-self: flex-start;
+}
+
+.skeleton-summary-card {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.skeleton-summary-title {
+  height: 24px;
+  width: 120px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.skeleton-label {
+  height: 16px;
+  width: 80px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-value {
+  height: 16px;
+  width: 60px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-divider {
+  height: 1px;
+  background: #eee;
+  margin: 1.5rem 0;
+}
+
+.skeleton-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 1.5rem 0;
+}
+
+.skeleton-total-row .skeleton-label {
+  width: 100px;
+  height: 20px;
+}
+
+.skeleton-total-row .skeleton-value {
+  width: 100px;
+  height: 24px;
+}
+
+.skeleton-checkout-btn {
+  height: 52px;
+  width: 100%;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+}
+
+.skeleton-continue-shopping {
+  height: 20px;
+  width: 160px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin: 0 auto;
+}
+
+/* Empty Cart Skeleton */
+.skeleton-empty-cart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+  padding: 2rem;
+}
+
+.skeleton-empty-icon {
+  height: 80px;
+  width: 80px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 50%;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-empty-title {
+  height: 28px;
+  width: 200px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-empty-text {
+  height: 16px;
+  width: 250px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-empty-btn {
+  height: 45px;
+  width: 180px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+  border-radius: 4px;
+}
+
+/* Animation */
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .skeleton-cart-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .skeleton-cart-item {
+    grid-template-columns: 100px 1fr;
+    grid-template-rows: auto auto;
+    gap: 1rem;
+  }
+  
+  .skeleton-item-quantity,
+  .skeleton-item-total,
+  .skeleton-item-remove {
+    grid-column: 2;
+    justify-self: start;
+  }
+  
+  .skeleton-item-quantity {
+    grid-row: 2;
+  }
+  
+  .skeleton-item-total {
+    grid-row: 2;
+    justify-self: end;
+  }
+  
+  .skeleton-item-remove {
+    grid-row: 2;
+    justify-self: end;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .cart-skeleton {
+    padding: 1rem;
+  }
+  
+  .skeleton-cart-item {
+    grid-template-columns: 80px 1fr;
+  }
+  
+  .skeleton-item-image {
+    height: 80px;
+    width: 80px;
+  }
+  
+  .skeleton-item-name {
+    width: 140px;
+  }
+}
+
+@media (max-width: 480px) {
+  .skeleton-items-header {
+    display: none;
+  }
+  
+  .skeleton-cart-item {
+    grid-template-columns: 70px 1fr;
+    padding: 1rem 0;
+  }
+  
+  .skeleton-item-image {
+    height: 70px;
+    width: 70px;
+  }
+  
+  .skeleton-summary-card {
+    padding: 1rem;
+  }
+}
