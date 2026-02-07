@@ -53,20 +53,31 @@ const AdminOrderDetail = () => {
   };
 
   const deleteOrder = async () => {
-    if (!window.confirm('Purge this record from core?')) return;
+    // 1. Confirm with the user
+    if (!window.confirm('PERMANENT PURGE: This will remove the record from the database forever. Continue?')) return;
+
     try {
       const token = Cookies.get('authToken');
+
+      // 2. Axios DELETE with a request body requires the 'data' key
       const response = await axios.delete(`http://localhost:8000/api/orders/admin/${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        data: { hardDelete: true } // This triggers the hard delete logic in your controller
       });
+
       if (response.data.success) {
-        toast.success('Order Purged');
+        toast.success('Order Purged Permanently');
         navigate('/admin/orders');
       }
-    } catch (error) { toast.error('Purge error'); }
+    } catch (error) {
+      // 3. Handle the specific error message from your backend (e.g., Shipped/Delivered restriction)
+      const errorMsg = error.response?.data?.message || 'Purge error';
+      toast.error(errorMsg);
+      console.error('Delete error:', error);
+    }
   };
 
-  const theme = isDark 
+  const theme = isDark
     ? { bg: 'bg-[#050505]', card: 'bg-[#111] border-white/5', input: 'bg-white/5 border-white/10 text-white', option: 'bg-[#1a1a1a] text-white' }
     : { bg: 'bg-slate-50', card: 'bg-white border-slate-200', input: 'bg-white border-slate-300 text-slate-900', option: 'bg-white text-slate-900' };
 
@@ -80,7 +91,7 @@ const AdminOrderDetail = () => {
 
   return (
     <div className={`min-h-screen ${theme.bg} ${isDark ? 'text-white' : 'text-slate-900'} transition-colors duration-500 pb-20 font-sans overflow-x-hidden`}>
-      
+
       <header className={`fixed top-0 w-full z-40 backdrop-blur-md border-b ${isDark ? 'border-white/5 bg-black/50' : 'border-slate-200 bg-white/50'} px-5 py-3`}>
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div className="flex items-center gap-4">
@@ -114,14 +125,14 @@ const AdminOrderDetail = () => {
             {/* STREAMLINED STATUS CARD */}
             <div className={`${theme.card} rounded-[2rem] border p-6 shadow-2xl`}>
               <h3 className="text-xs font-black uppercase tracking-[0.2em] mb-6 flex items-center gap-2">
-                <Info size={14} className="text-amber-500" /> 
+                <Info size={14} className="text-amber-500" />
                 Update Status
               </h3>
               <div className="space-y-4">
                 <div className="relative">
                   <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest mb-2 block ml-1">Fulfillment State</label>
-                  <select 
-                    value={statusUpdate} 
+                  <select
+                    value={statusUpdate}
                     onChange={(e) => setStatusUpdate(e.target.value)}
                     className={`appearance-none w-full ${theme.input} rounded-2xl py-4 px-6 text-[11px] font-black uppercase tracking-widest cursor-pointer outline-none focus:ring-2 focus:ring-amber-500/50`}
                   >
@@ -132,8 +143,8 @@ const AdminOrderDetail = () => {
                     <option className={theme.option} value="Cancelled">Cancelled</option>
                   </select>
                 </div>
-                <button 
-                  onClick={handleStatusUpdate} 
+                <button
+                  onClick={handleStatusUpdate}
                   disabled={updating || statusUpdate === order.orderStatus}
                   className="w-full bg-amber-500 text-black py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-amber-400 active:scale-95 transition-all disabled:opacity-30 shadow-lg shadow-amber-500/20"
                 >

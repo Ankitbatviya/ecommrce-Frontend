@@ -62,7 +62,7 @@ const AdminUsers = () => {
     if (!window.confirm(`Permanent removal of this entity?`)) return;
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.delete(`http://localhost:8000/api/users/${userId}`, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await axios.delete(`http://localhost:8000/api/users/${userId}`, { headers: { Authorization: `Bearer ${token}` },data: { permanent: true } });
       if (response.data.success) { 
         toast.success('Entity Removed'); 
         fetchUsers(); 

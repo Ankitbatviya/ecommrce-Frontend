@@ -151,8 +151,7 @@ const AdminProducts = () => {
                     </td>
                     <td className="px-6 py-5 text-right space-x-2">
                       <button onClick={() => { setEditingProduct(p); setNewProduct({...p}); setShowAddForm(true); }} className="p-2 text-slate-400 hover:text-amber-500"><Edit3 size={18} /></button>
-                      <button onClick={async () => { if(window.confirm('Purge?')) { await axios.delete(`http://localhost:8000/api/products/admin/${p._id}`, { headers: { Authorization: `Bearer ${Cookies.get('authToken')}` } }); fetchProducts(); } }} className="p-2 text-red-500/30 hover:text-red-500"><Trash2 size={18} /></button>
-                    </td>
+                      </td>
                   </tr>
                 ))}
               </tbody>

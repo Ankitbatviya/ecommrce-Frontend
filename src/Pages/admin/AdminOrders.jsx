@@ -68,7 +68,7 @@ const AdminOrders = () => {
       const token = Cookies.get('authToken');
       const response = await axios.delete(
         `http://localhost:8000/api/orders/admin/${orderId}`,
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` }, data: { hardDelete: true } }
       );
 
       if (response.data.success) {
