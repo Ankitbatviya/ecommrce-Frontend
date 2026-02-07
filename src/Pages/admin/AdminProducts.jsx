@@ -26,7 +26,7 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.get('http://localhost:8000/api/products/admin/all', {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/products/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { category: categoryFilter === 'all' ? '' : categoryFilter, search: searchTerm }
       });
@@ -51,7 +51,7 @@ const AdminProducts = () => {
     e.preventDefault();
     try {
       const token = Cookies.get('authToken');
-      const url = editingProduct ? `http://localhost:8000/api/products/admin/${editingProduct._id}` : 'http://localhost:8000/api/products/admin';
+      const url = editingProduct ? `${import.meta.env.VITE_API_URL}/api/products/admin/${editingProduct._id}` : `${import.meta.env.VITE_API_URL}/api/products/admin`;
       const method = editingProduct ? 'put' : 'post';
       const response = await axios[method](url, newProduct, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) {

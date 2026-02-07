@@ -18,7 +18,7 @@ const AdminOrders = () => {
   const fetchOrders = async () => {
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.get('http://localhost:8000/api/orders/admin/all', {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/all`, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
           page: currentPage,
@@ -47,7 +47,7 @@ const AdminOrders = () => {
     try {
       const token = Cookies.get('authToken');
       const response = await axios.put(
-        `http://localhost:8000/api/orders/admin/${orderId}/status`,
+        `${import.meta.env.VITE_API_URL}/api/orders/admin/${orderId}/status`,
         { status: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -67,7 +67,7 @@ const AdminOrders = () => {
     try {
       const token = Cookies.get('authToken');
       const response = await axios.delete(
-        `http://localhost:8000/api/orders/admin/${orderId}`,
+        `${import.meta.env.VITE_API_URL}/api/orders/admin/${orderId}`,
         { headers: { Authorization: `Bearer ${token}` }, data: { hardDelete: true } }
       );
 

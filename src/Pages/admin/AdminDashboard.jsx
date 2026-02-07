@@ -19,9 +19,9 @@ const AdminDashboard = () => {
       const token = Cookies.get('authToken');
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const [u, o, p] = await Promise.all([
-        axios.get('http://localhost:8000/api/users/all', config),
-        axios.get('http://localhost:8000/api/orders/admin/all', config),
-        axios.get('http://localhost:8000/api/products/admin/all', config)
+        axios.get(`${import.meta.env.VITE_API_URL}/api/users/all`, config),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/all`, config),
+        axios.get(`${import.meta.env.VITE_API_URL}/api/products/admin/all`, config)
       ]);
       setStats({
         totalUsers: u.data.data?.length || 0,

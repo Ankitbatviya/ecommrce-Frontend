@@ -44,13 +44,13 @@ const Checkout = () => {
       setLoading(true);
       const res = await cartService.getCart();
       if (!res.data || res.data.items.length === 0) {
-        navigate('/cart');
+        navigate(-1);
         return;
       }
       setCart(res.data);
     } catch (err) {
       toast.error('Failed to sync bag');
-      navigate('/cart');
+      navigate(-1);
     } finally {
       setLoading(false);
     }

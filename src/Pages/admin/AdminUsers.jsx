@@ -21,7 +21,7 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.get('http://localhost:8000/api/users/all', {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/users/all`, {
         headers: { Authorization: `Bearer ${token}` },
         params: { 
           page: currentPage, 
@@ -47,7 +47,7 @@ const AdminUsers = () => {
   const updateUserRole = async (userId, newRole) => {
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.put(`http://localhost:8000/api/users/${userId}/role`, { role: newRole }, { headers: { Authorization: `Bearer ${token}` } });
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/users/${userId}/role`, { role: newRole }, { headers: { Authorization: `Bearer ${token}` } });
       if (response.data.success) { 
         toast.success('Role Updated'); 
         fetchUsers(); 
@@ -62,7 +62,7 @@ const AdminUsers = () => {
     if (!window.confirm(`Permanent removal of this entity?`)) return;
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.delete(`http://localhost:8000/api/users/${userId}`, { headers: { Authorization: `Bearer ${token}` },data: { permanent: true } });
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${userId}`, { headers: { Authorization: `Bearer ${token}` },data: { permanent: true } });
       if (response.data.success) { 
         toast.success('Entity Removed'); 
         fetchUsers(); 

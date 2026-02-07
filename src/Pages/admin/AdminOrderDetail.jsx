@@ -17,7 +17,7 @@ const AdminOrderDetail = () => {
   const fetchOrderDetails = async () => {
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.get(`http://localhost:8000/api/orders/admin/${id}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/orders/admin/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (response.data.success) {
@@ -39,7 +39,7 @@ const AdminOrderDetail = () => {
     setUpdating(true);
     try {
       const token = Cookies.get('authToken');
-      const response = await axios.put(`http://localhost:8000/api/orders/admin/${id}/status`,
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/orders/admin/${id}/status`,
         { status: statusUpdate },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -60,7 +60,7 @@ const AdminOrderDetail = () => {
       const token = Cookies.get('authToken');
 
       // 2. Axios DELETE with a request body requires the 'data' key
-      const response = await axios.delete(`http://localhost:8000/api/orders/admin/${id}`, {
+      const response = await axios.delete(`${import.meta.env.VITE_API_URL}/api/orders/admin/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
         data: { hardDelete: true } // This triggers the hard delete logic in your controller
       });
