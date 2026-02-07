@@ -1,244 +1,133 @@
-// SignUp.jsx
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import '../Stylesheet/Login//loginPage.css';
+import { useSelector } from 'react-redux';
+import { ChevronLeft, ArrowRight, UserPlus, Eye, EyeOff } from 'lucide-react';
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    agreeTerms: false,
-  });
-
+  const isDark = useSelector((state) => state.theme.isDark);
+  const [formData, setFormData] = useState({ fullName: '', email: '', password: '', confirmPassword: '' });
+  const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
-
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match!");
-      return;
-    }
-
-    if (!formData.agreeTerms) {
-      toast.warning("Please agree to the Terms & Conditions");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
-      return;
-    }
-
+    if (formData.password !== formData.confirmPassword) return toast.error("Passphrase Conflict");
     setLoading(true);
-
     try {
-      // Make API request to backend
       const response = await axios.post('http://localhost:8000/api/users/register', {
         fullname: formData.fullName,
         email: formData.email,
         password: formData.password
       });
-
-      // Handle successful registration
       if (response.data.success) {
-        // Store token and user info in cookies
-        const cookieOptions = {
-          expires: 7, // 7 days
-          secure: true, // Use HTTPS in production
-          sameSite: 'strict',
-          path: '/'
-        };
-        
-        Cookies.set('authToken', response.data.token, cookieOptions);
-        Cookies.set('userInfo', JSON.stringify(response.data.user), cookieOptions);
-
-        toast.success('Registration successful! Redirecting...', {
-          autoClose: 2000
-        });
-
-        // Clear form
-        setFormData({
-          fullName: '',
-          email: '',
-          password: '',
-          confirmPassword: '',
-          agreeTerms: false,
-        });
-        
-        // Redirect after delay
-        setTimeout(() => {
-          window.location.href = '/'; // Change to your desired route
-        }, 2000);
+        Cookies.set('authToken', response.data.token, { expires: 7, path: '/' });
+        Cookies.set('userInfo', JSON.stringify(response.data.user), { expires: 7, path: '/' });
+        toast.success('Registry Entry Confirmed');
+        setTimeout(() => { window.location.href = '/'; }, 1000);
       }
     } catch (err) {
-      // Handle errors
-      if (err.response) {
-        // Server responded with error
-        const errorMessage = err.response.data.message || 'Registration failed';
-        
-        if (err.response.status === 400 && errorMessage.includes('already')) {
-          toast.error('Email already registered! Please login instead.');
-        } else {
-          toast.error(errorMessage);
-        }
-      } else if (err.request) {
-        // Request made but no response
-        toast.error('No response from server. Please check your connection.');
-      } else {
-        // Something else happened
-        toast.error('An unexpected error occurred. Please try again.');
-      }
-      console.error('Registration error:', err);
-    } finally {
-      setLoading(false);
-    }
+      toast.error('Initialization Failed');
+    } finally { setLoading(false); }
   };
 
+  const inputStyle = `w-full py-5 px-8 rounded-2xl text-[10px] font-black tracking-[0.2em] uppercase outline-none transition-all border ${
+    isDark 
+    ? 'bg-black/40 border-white/5 text-white focus:border-amber-500 focus:bg-black/60' 
+    : 'bg-white border-gray-100 text-black focus:border-black shadow-sm focus:shadow-xl'
+  }`;
+
   return (
-    <main className="login-container">
-      <button className="nav-back-btn" onClick={() => window.history.back()}>
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-        Return
-      </button>
-
-      <div className="login-split-layout">
-        {/* Visual Panel */}
-        <section className="login-visual-panel">
-          <div className="visual-overlay-signup" >
-            <span className="brand-label-alt">Join Us</span>
-            <h2 className="visual-title">Start your<br />journey here.</h2>
-          </div>
-          <img 
-            src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=1200" 
-            alt="Sign Up Aesthetic" 
-            className="visual-img"
-          />
-        </section>
-
-        {/* Content Panel */}
-        <section className="login-content-panel">
-          <div className="form-wrapper">
-            <header className="form-header">
-              <span className="brand-label">New Member</span>
-              <h1 className="main-title">Create Account</h1>
-            </header>
-
-            <form onSubmit={handleSubmit} className="auth-form">
-              <div className="input-group">
-                <label className="input-label">Full Name</label>
-                <input
-                  type="text"
-                  name="fullName"
-                  className="form-input"
-                  placeholder="John Doe"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              <div className="input-group">
-                <label className="input-label">Email Address</label>
-                <input
-                  type="email"
-                  name="email"
-                  className="form-input"
-                  placeholder="name@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  disabled={loading}
-                />
-              </div>
-
-              {/* Password Row for tighter vertical space */}
-              <div className="input-row">
-                <div className="input-group">
-                  <label className="input-label">Password</label>
-                  <input
-                    type="password"
-                    name="password"
-                    className="form-input"
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    minLength="6"
-                  />
-                </div>
-                <div className="input-group">
-                  <label className="input-label">Confirm</label>
-                  <input
-                    type="password"
-                    name="confirmPassword"
-                    className="form-input"
-                    placeholder="••••••••"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    minLength="6"
-                  />
-                </div>
-              </div>
-
-              <div className="form-options">
-                <label className="checkbox-container">
-                  <input
-                    type="checkbox"
-                    name="agreeTerms"
-                    checked={formData.agreeTerms}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                  />
-                  <span className="checkbox-text">I agree to the Terms & Conditions</span>
-                </label>
-              </div>
-
-              <div className="button-stack">
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  disabled={loading}
-                >
-                  {loading ? 'Registering...' : 'Register'}
-                </button>
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={() => window.location.href='/login'}
-                  disabled={loading}
-                >
-                  Already a member? Sign In
-                </button>
-              </div>
-            </form>
-
-            <footer className="form-footer">
-              <p>Secure Membership Registration</p>
-            </footer>
-          </div>
-        </section>
+    <main className={`relative min-h-screen w-full flex items-center justify-center overflow-hidden transition-colors duration-700 ${isDark ? 'bg-[#050505]' : 'bg-[#fafafa]'}`}>
+      
+      {/* Background Editorial Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=2000" 
+          className={`w-full h-full object-cover grayscale transition-all duration-1000 ${isDark ? 'opacity-20 brightness-50' : 'opacity-10 brightness-100'}`}
+          alt="Background"
+        />
+        <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-b from-black via-transparent to-black' : 'bg-gradient-to-b from-white via-transparent to-white'}`} />
       </div>
+
+      <section className="relative z-10 w-full max-w-xl px-6 animate-in fade-in slide-in-from-bottom-5 duration-1000">
+        <button onClick={() => window.history.back()} className="mb-12 flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-all mx-auto">
+          <ChevronLeft size={14} strokeWidth={3} /> Return
+        </button>
+
+        <div className="text-center mb-12 space-y-3">
+          <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center border-2 border-dashed ${isDark ? 'border-amber-500/30' : 'border-amber-500'}`}>
+            <UserPlus className="text-amber-500" size={32} strokeWidth={1} />
+          </div>
+          <h1 className={`text-5xl font-black tracking-tighter uppercase italic leading-none ${isDark ? 'text-white' : 'text-black'}`}>
+            Registry
+          </h1>
+          <p className="text-[9px] font-bold text-gray-500 uppercase tracking-[0.3em]">Protocol Initiation // Entry 2026</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <input 
+              type="text" 
+              placeholder="Legal Name" 
+              onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+              className={inputStyle}
+              required
+            />
+            <input 
+              type="email" 
+              placeholder="Email Identifier" 
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className={inputStyle}
+              required
+            />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="relative">
+              <input 
+                type={showPass ? "text" : "password"} 
+                placeholder="Passphrase" 
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                className={inputStyle}
+                required
+              />
+              <button 
+                type="button" 
+                onClick={() => setShowPass(!showPass)}
+                className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-500 hover:text-amber-500 transition-colors"
+              >
+                {showPass ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+            <input 
+              type={showPass ? "text" : "password"} 
+              placeholder="Verify Pass" 
+              onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              className={inputStyle}
+              required
+            />
+          </div>
+
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-black dark:bg-white text-white dark:text-black py-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.5em] transition-all active:scale-95 shadow-2xl flex items-center justify-center gap-3 group"
+          >
+            {loading ? 'Processing Entry...' : 'Confirm Entry'} 
+            <ArrowRight size={18} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
+          </button>
+        </form>
+
+        <div className="mt-12 text-center">
+          <button onClick={() => window.location.href='/login'} className="group">
+            <p className="text-[10px] font-black text-gray-500 uppercase tracking-widest">
+              Existing Account? <span className={`transition-colors group-hover:text-amber-500 ${isDark ? 'text-white' : 'text-black'}`}>Authenticate</span>
+            </p>
+          </button>
+        </div>
+      </section>
     </main>
   );
 };

@@ -1,73 +1,143 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { Instagram, Twitter, Facebook, ArrowRight } from 'lucide-react';
+import { Instagram, Twitter, Facebook, ArrowRight, Globe } from 'lucide-react';
 import Logo from '../../assets/SVG/Logo.svg';
 
-function Footer() {
+const Footer = () => {
   const isDark = useSelector((state) => state.theme.isDark);
 
-  const footerBg = isDark ? "bg-[#0a0a0a] text-white border-white/5" : "bg-gray-50 text-gray-900 border-gray-200";
-  const mutedText = isDark ? "text-gray-500" : "text-gray-400";
+  // Theme-based styling logic
+  const theme = isDark 
+    ? {
+        bg: "bg-[#050505]",
+        text: "text-white",
+        muted: "text-gray-500",
+        border: "border-white/5",
+        input: "bg-white/5 border-white/10",
+        logo: "bg-amber-500",
+        logoImg: ""
+      }
+    : {
+        bg: "bg-[#fafafa]",
+        text: "text-black",
+        muted: "text-gray-400",
+        border: "border-gray-200",
+        input: "bg-white border-gray-200",
+        logo: "bg-black",
+        logoImg: "invert"
+      };
 
   return (
-    <footer className={`pt-20 pb-10 px-6 md:px-[8%] font-sans border-t transition-colors duration-500 ${footerBg}`}>
+    <footer className={`pt-24 pb-10 px-6 md:px-[8%] font-sans border-t transition-colors duration-700 ${theme.bg} ${theme.text} ${theme.border}`}>
       <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 mb-20">
-          <div className="lg:col-span-5 space-y-8">
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 ${isDark ? 'bg-amber-500' : 'bg-black'} rounded-xl flex items-center justify-center`}>
-                <img src={Logo} alt="Logo" className={`w-6 h-6 ${isDark ? '' : 'invert'}`} />
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 mb-24">
+          
+          {/* Brand & Newsletter Section */}
+          <div className="lg:col-span-5 space-y-10">
+            <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+              <div className={`w-12 h-12 ${theme.logo} rounded-[1.2rem] flex items-center justify-center transition-transform group-hover:rotate-12 duration-500 shadow-xl`}>
+                <img src={Logo} alt="Logo" className={`w-7 h-7 ${theme.logoImg}`} />
               </div>
-              <span className="font-black tracking-[0.2em] text-xl uppercase italic">Essential</span>
+              <div className="flex flex-col">
+                <span className="font-black tracking-[0.3em] text-2xl uppercase italic leading-none">Essential</span>
+                <span className="text-[8px] font-bold tracking-[0.5em] uppercase opacity-40">Narrative 2026</span>
+              </div>
             </div>
-            <p className={`${mutedText} text-sm leading-relaxed max-w-sm font-medium uppercase tracking-tight`}>
-              Defining the future of timeless fashion through curated excellence.
+
+            <p className={`${theme.muted} text-sm leading-relaxed max-w-sm font-medium uppercase tracking-tight`}>
+              Redefining the archive of slow fashion. We curate timeless silhouettes for the digital age, prioritizing sustainability over trends.
             </p>
-            <div className="relative max-w-sm group">
-              <input type="email" placeholder="Join narrative..." className={`w-full ${isDark ? 'bg-white/5' : 'bg-white'} border border-white/10 rounded-2xl py-4 px-6 text-xs font-bold outline-none focus:ring-2 focus:ring-amber-500/50`} />
-              <button className="absolute right-2 top-2 bottom-2 bg-amber-500 hover:bg-amber-400 text-black px-4 rounded-xl transition-all">
-                <ArrowRight size={18} strokeWidth={3} />
-              </button>
+
+            <div className="space-y-4">
+              <h5 className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500">Subscribe to Intel</h5>
+              <div className="relative max-w-sm group">
+                <input 
+                  type="email" 
+                  placeholder="DIGITAL IDENTIFIER..." 
+                  className={`w-full ${theme.input} border rounded-2xl py-5 px-6 text-[10px] font-black tracking-widest outline-none focus:ring-2 focus:ring-amber-500/30 transition-all uppercase placeholder:opacity-30`} 
+                />
+                <button className="absolute right-2 top-2 bottom-2 bg-amber-500 hover:bg-amber-400 text-black px-5 rounded-xl transition-all shadow-lg active:scale-95">
+                  <ArrowRight size={18} strokeWidth={3} />
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
-            <FooterCol title="Collections" isDark={isDark}>
-              <a href="#">New Arrivals</a>
-              <a href="#">Slow Fashion</a>
+          {/* Navigation Links */}
+          <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12">
+            
+            <FooterCol title="Collections">
+              <Link to="/products">New Arrivals</Link>
+              <Link to="/products?category=SlowFashion">Slow Fashion</Link>
+              <Link to="/products?category=Apparel">Archive 01</Link>
+              <Link to="/products?category=Jewelry">Accessories</Link>
             </FooterCol>
-            <FooterCol title="Company" isDark={isDark}>
+
+            <FooterCol title="Company">
               <Link to="/aboutus">Our Story</Link>
               <Link to="/contact">Contact</Link>
+              <Link to="/careers">Careers</Link>
+              <Link to="/stores">Locations</Link>
             </FooterCol>
-            <FooterCol title="Legal" isDark={isDark}>
-              <Link to="/terms/privacy">Privacy</Link>
-              <Link to="/terms/terms">Terms</Link>
+
+            <FooterCol title="Legal Protocol">
+              <Link to="/terms/terms">Terms of Service</Link>
+              <Link to="/terms/privacy">Privacy Policy</Link>
+              <Link to="/terms/shipping">Shipping Policy</Link>
+              <Link to="/terms/returns">Returns & Refunds</Link>
             </FooterCol>
+            
           </div>
         </div>
 
-        <div className={`border-t ${isDark ? 'border-white/5' : 'border-gray-200'} pt-10 flex flex-col md:flex-row justify-between items-center gap-6`}>
-          <p className="text-[10px] font-black text-gray-500 uppercase tracking-[0.3em]">&copy; 2026 ESSENTIAL COLLECTION.</p>
-          <div className="flex gap-6 opacity-40">
-             <Instagram size={18} /> <Twitter size={18} /> <Facebook size={18} />
+        {/* Bottom Bar */}
+        <div className={`border-t ${theme.border} pt-12 flex flex-col md:flex-row justify-between items-center gap-8`}>
+          <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8">
+            <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">
+              &copy; 2026 Essential Collection. All rights reserved.
+            </p>
+            <div className="flex items-center gap-2 px-3 py-1 bg-white/5 border border-white/5 rounded-full">
+              <Globe size={10} className="text-amber-500" />
+              <span className="text-[8px] font-black uppercase tracking-widest opacity-40">India / Global</span>
+            </div>
+          </div>
+
+          <div className="flex gap-8">
+            <SocialLink icon={<Instagram size={18} />} href="#" />
+            <SocialLink icon={<Twitter size={18} />} href="#" />
+            <SocialLink icon={<Facebook size={18} />} href="#" />
           </div>
         </div>
       </div>
     </footer>
   );
-}
+};
 
-const FooterCol = ({ title, children, isDark }) => (
-  <div className="space-y-6">
-    <h5 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em]">{title}</h5>
-    <ul className={`text-xs font-bold space-y-4 uppercase tracking-widest ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+// Sub-components for better organization
+const FooterCol = ({ title, children }) => (
+  <div className="space-y-8">
+    <h5 className="text-[10px] font-black text-amber-500 uppercase tracking-[0.4em] relative w-fit">
+      {title}
+      <span className="absolute -bottom-2 left-0 w-4 h-[2px] bg-amber-500/30" />
+    </h5>
+    <ul className="flex flex-col gap-4 text-[10px] font-black uppercase tracking-[0.2em] opacity-60">
       {React.Children.map(children, child => (
-        <li className="hover:text-amber-500 transition-colors cursor-pointer">{child}</li>
+        <li className="hover:text-amber-500 hover:opacity-100 transition-all cursor-pointer transform hover:translate-x-1">
+          {child}
+        </li>
       ))}
     </ul>
   </div>
+);
+
+const SocialLink = ({ icon, href }) => (
+  <a 
+    href={href} 
+    className="opacity-40 hover:opacity-100 hover:text-amber-500 transition-all transform hover:-translate-y-1"
+  >
+    {icon}
+  </a>
 );
 
 export default Footer;

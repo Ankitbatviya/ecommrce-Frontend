@@ -1,280 +1,146 @@
-// Pages/TermsConditions.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import '../Stylesheet/Legal/TermsConditions.css';
+import { 
+  ShieldAlert, Lock, Truck, RefreshCcw, 
+  ChevronRight, FileText, Loader2, Mail 
+} from 'lucide-react';
 
 const TermsConditions = () => {
   const { type } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
+  const isDark = useSelector((state) => state.theme.isDark);
+  
   const [activeTab, setActiveTab] = useState(type || 'terms');
   const [termsContent, setTermsContent] = useState({});
   const [loading, setLoading] = useState(true);
 
   const tabs = [
-    { id: 'terms', title: 'Terms of Service', description: 'Our terms and conditions' },
-    { id: 'privacy', title: 'Privacy Policy', description: 'How we handle your data' },
-    { id: 'shipping', title: 'Shipping Policy', description: 'Delivery information' },
-    { id: 'returns', title: 'Returns & Refunds', description: 'Return and refund policy' }
+    { id: 'terms', title: 'Terms of Service', icon: <FileText size={18}/> },
+    { id: 'privacy', title: 'Privacy Policy', icon: <Lock size={18}/> },
+    { id: 'shipping', title: 'Shipping Policy', icon: <Truck size={18}/> },
+    { id: 'returns', title: 'Returns & Refunds', icon: <RefreshCcw size={18}/> }
   ];
 
-  // Handle direct policy routes and hash navigation
   useEffect(() => {
     const path = location.pathname;
-    
-    // Handle direct policy routes like /privacy-policy
-    if (path === '/privacy-policy') {
-      setActiveTab('privacy');
-      navigate('/terms/privacy', { replace: true });
-    } else if (path === '/shipping-policy') {
-      setActiveTab('shipping');
-      navigate('/terms/shipping', { replace: true });
-    } else if (path === '/returns-policy') {
-      setActiveTab('returns');
-      navigate('/terms/returns', { replace: true });
-    } else if (path === '/terms' && !type) {
-      setActiveTab('terms');
-      navigate('/terms/terms', { replace: true });
-    } else if (location.hash) {
-      const tabId = location.hash.replace('#', '');
-      if (tabs.some(tab => tab.id === tabId)) {
-        setActiveTab(tabId);
-      }
-    }
-  }, [location.pathname, location.hash, type, navigate]);
+    if (path === '/privacy-policy') navigate('/terms/privacy', { replace: true });
+    else if (path === '/shipping-policy') navigate('/terms/shipping', { replace: true });
+    else if (path === '/returns-policy') navigate('/terms/returns', { replace: true });
+  }, [location.pathname, navigate]);
 
-  // Fetch terms when active tab changes
+  useEffect(() => {
+    if (type && type !== activeTab) setActiveTab(type);
+  }, [type]);
+
   useEffect(() => {
     fetchTerms(activeTab);
   }, [activeTab]);
 
-  // Handle tab click
-  const handleTabClick = (tabId) => {
-    setActiveTab(tabId);
-    navigate(`/terms/${tabId}`);
-  };
-
-  // Fetch terms from API - FIXED ENDPOINT
   const fetchTerms = async (tabId) => {
     setLoading(true);
     try {
-      console.log(`Fetching terms for: ${tabId}`);
-      const response = await axios.get(`http://localhost:8000/api/terms/${tabId}`, {
-        timeout: 5000
-      });
-      
-      console.log('API Response:', response.data);
-      
+      const response = await axios.get(`http://localhost:8000/api/terms/${tabId}`, { timeout: 5000 });
       if (response.data.success) {
-        setTermsContent(prev => ({
-          ...prev,
-          [tabId]: response.data.data
-        }));
-      } else {
-        // API returned success: false
-        setTermsContent(prev => ({
-          ...prev,
-          [tabId]: null
-        }));
+        setTermsContent(prev => ({ ...prev, [tabId]: response.data.data }));
       }
     } catch (error) {
-      console.error(`Error fetching ${tabId}:`, error);
-      
-      // Handle different error cases
-      if (error.code === 'ECONNABORTED') {
-        toast.error('Request timeout. Please try again.');
-      } else if (error.response) {
-        // Server responded with error status
-        switch (error.response.status) {
-          case 404:
-            setTermsContent(prev => ({
-              ...prev,
-              [tabId]: null
-            }));
-            break;
-          case 500:
-            toast.error('Server error. Please try again later.');
-            break;
-          default:
-            toast.error(`Failed to load ${tabId.replace('-', ' ')}`);
-        }
-      } else if (error.request) {
-        // Request made but no response
-        toast.error('Network error. Please check your connection.');
-      } else {
-        toast.error(`Failed to load ${tabId.replace('-', ' ')}`);
-      }
-      
-      // Ensure content is set to null for 404
-      if (error.response?.status === 404) {
-        setTermsContent(prev => ({
-          ...prev,
-          [tabId]: null
-        }));
-      }
+      console.error(error);
+      setTermsContent(prev => ({ ...prev, [tabId]: null }));
     } finally {
       setLoading(false);
     }
   };
 
-  // Format date for display
-  const formatDate = (dateString) => {
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-    } catch (error) {
-      return 'Unknown date';
-    }
-  };
-
-  // Format content with proper HTML
-  const formatContent = (content) => {
-    if (!content) return '';
-    
-    // Convert markdown-style headers to HTML
-    let formatted = content
-      .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-      .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-      .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-      .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
-      .replace(/\n\n/g, '</p><p>')
-      .replace(/\n/g, '<br>');
-    
-    // Wrap in paragraphs if not already
-    if (!formatted.includes('<h') && !formatted.includes('<p>')) {
-      formatted = `<p>${formatted}</p>`;
-    }
-    
-    return formatted;
-  };
+  const theme = isDark 
+    ? { bg: 'bg-[#050505]', text: 'text-white', card: 'bg-[#111] border-white/5', active: 'bg-amber-500 text-black' }
+    : { bg: 'bg-[#fafafa]', text: 'text-black', card: 'bg-white border-gray-200 shadow-xl', active: 'bg-black text-white' };
 
   return (
-    <div className="terms-container">
-      <div className="terms-header">
-        <h1>Legal Information</h1>
-        <p>Important information about using our services</p>
-      </div>
+    <main className={`min-h-screen ${theme.bg} ${theme.text} pt-32 pb-20 transition-colors duration-700 font-sans`}>
+      <div className="max-w-7xl mx-auto px-6">
+        
+        {/* Header Section */}
+        <header className="mb-20 space-y-4">
+          <span className="text-[10px] font-black uppercase tracking-[0.5em] text-amber-500 italic">Legal Repository</span>
+          <h1 className="text-5xl md:text-7xl font-black tracking-tighter uppercase italic leading-none">
+            Corporate <span className="font-serif not-italic font-light text-amber-600">Protocol</span>
+          </h1>
+          <p className="text-xs font-bold text-gray-500 uppercase tracking-widest max-w-md">Documenting the governance and safety measures of the Essential narrative.</p>
+        </header>
 
-      <div className="terms-layout">
-        {/* Sidebar Navigation */}
-        <div className="terms-sidebar">
-          <nav className="terms-nav">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Sidebar Navigation */}
+          <aside className="lg:col-span-4 space-y-4 sticky top-32">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                className={`nav-tab ${activeTab === tab.id ? 'active' : ''}`}
-                onClick={() => handleTabClick(tab.id)}
+                onClick={() => navigate(`/terms/${tab.id}`)}
+                className={`w-full p-6 rounded-2xl border transition-all duration-300 flex items-center justify-between group ${activeTab === tab.id ? theme.active : `${theme.card} opacity-60 hover:opacity-100 hover:border-amber-500/30`}`}
               >
-                <div className="tab-icon">
-                  {tab.id === 'terms' && (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                      <polyline points="14 2 14 8 20 8" />
-                      <line x1="16" y1="13" x2="8" y2="13" />
-                      <line x1="16" y1="17" x2="8" y2="17" />
-                      <polyline points="10 9 9 9 8 9" />
-                    </svg>
-                  )}
-                  {tab.id === 'privacy' && (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
-                      <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                  )}
-                  {tab.id === 'shipping' && (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="7" cy="7" r="2" />
-                      <circle cx="17" cy="17" r="2" />
-                      <path d="M9.5 6.5L12 3h8v8l-3.5 3.5" />
-                      <path d="M14 14l-3.5 3.5" />
-                      <path d="M9.5 6.5L6.5 9.5" />
-                    </svg>
-                  )}
-                  {tab.id === 'returns' && (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20 12.5V22H4V2h8.5" />
-                      <polyline points="14 2 20 2 20 8" />
-                      <path d="M12 12l4-4-4-4" />
-                      <path d="M16 8H8" />
-                      <circle cx="8" cy="16" r="2" />
-                      <path d="M10 16c0-1.1.9-2 2-2s2 .9 2 2" />
-                    </svg>
-                  )}
+                <div className="flex items-center gap-4">
+                  <div className={`${activeTab === tab.id ? 'text-current' : 'text-amber-500'}`}>{tab.icon}</div>
+                  <span className="text-[11px] font-black uppercase tracking-widest">{tab.title}</span>
                 </div>
-                <div className="tab-info">
-                  <span className="tab-title">{tab.title}</span>
-                  <span className="tab-desc">{tab.description}</span>
-                </div>
+                <ChevronRight size={16} className={`transition-transform group-hover:translate-x-1 ${activeTab === tab.id ? 'opacity-100' : 'opacity-20'}`} />
               </button>
             ))}
-          </nav>
-        </div>
 
-        {/* Main Content */}
-        <div className="terms-content">
-          {loading ? (
-            <div className="terms-loading">
-              <div className="spinner"></div>
-              <p>Loading {tabs.find(t => t.id === activeTab)?.title}...</p>
+            <div className={`mt-10 p-8 rounded-[2.5rem] border border-dashed ${isDark ? 'border-white/10' : 'border-gray-300'} space-y-4`}>
+               <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-amber-500">Legal Inquiry</h4>
+               <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">For clarification regarding our protocols, reach out to our legal department.</p>
+               <a href="mailto:legal@essential.com" className="flex items-center gap-3 text-[11px] font-black uppercase tracking-widest hover:text-amber-500 transition-colors">
+                 <Mail size={14} /> legal@essential.com
+               </a>
             </div>
-          ) : termsContent[activeTab] ? (
-            <div className="terms-document">
-              <div className="document-header">
-                <h2>{termsContent[activeTab].title}</h2>
-                <div className="document-meta">
-                  <span className="version">Version {termsContent[activeTab].version || 1}</span>
-                  <span className="last-updated">
-                    Last updated: {formatDate(termsContent[activeTab].lastUpdated)}
-                  </span>
-                </div>
-              </div>
+          </aside>
 
-              <div className="document-content">
-                {/* Safely render HTML content */}
+          {/* Main Document Content */}
+          <section className="lg:col-span-8 animate-in fade-in slide-in-from-right-4 duration-1000">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-32 gap-4">
+                <Loader2 className="animate-spin text-amber-500" size={32} />
+                <p className="text-[10px] font-black uppercase tracking-widest opacity-40">Decrypting Protocol...</p>
+              </div>
+            ) : termsContent[activeTab] ? (
+              <div className={`p-10 md:p-16 rounded-[3rem] border ${theme.card} relative overflow-hidden`}>
+                <div className="absolute top-0 right-0 p-8 opacity-5">
+                   <ShieldAlert size={120} />
+                </div>
+                
+                <h2 className="text-3xl font-black uppercase italic tracking-tighter mb-4">{termsContent[activeTab].title}</h2>
+                <div className="flex items-center gap-6 text-[9px] font-black uppercase tracking-widest text-gray-500 mb-12 pb-6 border-b border-white/5">
+                   <span>Ver. {termsContent[activeTab].version || '1.0'}</span>
+                   <span>Last Indexed: {new Date(termsContent[activeTab].lastUpdated).toLocaleDateString()}</span>
+                </div>
+
                 <div 
+                  className="prose prose-sm prose-invert max-w-none 
+                  text-sm font-medium leading-relaxed uppercase tracking-tight opacity-70 
+                  space-y-6 [&>h1]:text-xl [&>h1]:font-black [&>h1]:text-white 
+                  [&>h2]:text-lg [&>h2]:font-black [&>h2]:text-amber-500 [&>h2]:pt-6
+                  [&>p]:mb-4 [&>br]:hidden"
                   dangerouslySetInnerHTML={{ 
-                    __html: formatContent(termsContent[activeTab].content)
+                    __html: termsContent[activeTab].content.replace(/\n\n/g, '<br/><br/>')
                   }} 
                 />
               </div>
-
-              <div className="document-footer">
-                <p>
-                  <strong>Note:</strong> By using our services, you agree to these terms.
-                  Please review them carefully.
-                </p>
-                <p className="contact-info">
-                  For questions about our policies, contact us at <strong>legal@essential.com</strong>
-                </p>
+            ) : (
+              <div className="text-center py-32 space-y-6">
+                 <ShieldAlert size={48} className="mx-auto text-red-500 opacity-20" />
+                 <h3 className="text-xl font-black uppercase italic tracking-tighter">Protocol Void</h3>
+                 <button onClick={() => fetchTerms(activeTab)} className="px-10 py-4 bg-amber-500 text-black rounded-2xl font-black text-[10px] uppercase tracking-widest">Retry Retrieval</button>
               </div>
-            </div>
-          ) : (
-            <div className="no-terms">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                <polyline points="14 2 14 8 20 8" />
-                <line x1="16" y1="13" x2="8" y2="13" />
-                <line x1="16" y1="17" x2="8" y2="17" />
-                <polyline points="10 9 9 9 8 9" />
-              </svg>
-              <h3>No {tabs.find(t => t.id === activeTab)?.title} Available</h3>
-              <p>Check back soon for our {activeTab.replace('-', ' ')} policy.</p>
-              <button 
-                className="retry-btn"
-                onClick={() => fetchTerms(activeTab)}
-              >
-                Retry Loading
-              </button>
-            </div>
-          )}
+            )}
+          </section>
+
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

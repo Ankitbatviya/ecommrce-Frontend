@@ -1,150 +1,145 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { Link } from 'react-router-dom';
-import '../Stylesheet/Auth/ForgotPassword.css';
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+// Swapped ShieldKeyhole for ShieldCheck for better compatibility
+import { ChevronLeft, Mail, ShieldCheck, ArrowRight, CheckCircle2, RefreshCw } from 'lucide-react';
 
 const ForgotPassword = () => {
+  const isDark = useSelector((state) => state.theme.isDark);
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!email) {
-      toast.error('Please enter your email address');
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error('Please enter a valid email address');
-      return;
-    }
+    if (!email) return toast.error('Email Identifier Required');
 
     setLoading(true);
-
     try {
+      // Adjust this URL to your actual backend endpoint
       const response = await axios.post('http://localhost:8000/api/auth/forgot-password', {
         email: email
       });
 
       if (response.data.success) {
         setEmailSent(true);
-        toast.success('Password reset link sent to your email!');
-      } else {
-        toast.error(response.data.message || 'Failed to send reset link');
+        toast.success('Protocol Initiated: Check Email');
       }
     } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.message || 'Something went wrong');
-      } else if (error.request) {
-        toast.error('No response from server. Check your connection.');
-      } else {
-        toast.error('An error occurred. Please try again.');
-      }
-      console.error('Forgot password error:', error);
+      toast.error(error.response?.data?.message || 'Transmission Error');
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="forgot-password-page">
-      <div className="forgot-password-container">
-        <div className="forgot-password-card">
-          <div className="forgot-password-header">
-            <Link to="/login" className="back-link">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              Back to Login
-            </Link>
-            <h1>Reset Your Password</h1>
-            <p>Enter your email address and we'll send you a link to reset your password.</p>
-          </div>
+  const theme = isDark 
+    ? { bg: 'bg-[#050505]', text: 'text-white', input: 'bg-black/40 border-white/5 text-white focus:border-amber-500' }
+    : { bg: 'bg-[#fafafa]', text: 'text-black', input: 'bg-white border-gray-200 text-black focus:border-black shadow-sm' };
 
-          {!emailSent ? (
-            <form onSubmit={handleSubmit} className="forgot-password-form">
-              <div className="form-group">
-                <label htmlFor="email" className="form-label">Email Address</label>
-                <input
-                  type="email"
-                  id="email"
-                  className="form-input"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  disabled={loading}
-                />
+  return (
+    <main className={`relative min-h-screen w-full flex items-center justify-center overflow-hidden transition-colors duration-700 ${theme.bg}`}>
+      
+      {/* Background Editorial Layer */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src="https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&q=80&w=2000" 
+          className={`w-full h-full object-cover grayscale transition-all duration-1000 ${isDark ? 'opacity-10 brightness-50' : 'opacity-5 brightness-100'}`}
+          alt="Background"
+        />
+        <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-black via-transparent to-black' : 'bg-gradient-to-t from-white via-transparent to-white'}`} />
+      </div>
+
+      <section className="relative z-10 w-full max-w-lg px-6 animate-in fade-in zoom-in-95 duration-1000">
+        <button onClick={() => navigate('/login')} className="mb-16 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-all mx-auto group">
+          <ChevronLeft size={14} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform"/> Return to Auth
+        </button>
+
+        {!emailSent ? (
+          <div className="space-y-10">
+            <div className="text-center space-y-4">
+              <div className={`w-20 h-20 mx-auto rounded-3xl flex items-center justify-center border ${isDark ? 'border-white/10 bg-white/5 shadow-[0_0_30px_rgba(245,158,11,0.1)]' : 'border-gray-100 bg-white shadow-xl'}`}>
+                <ShieldCheck className="text-amber-500" size={32} strokeWidth={1.5} />
+              </div>
+              <div className="space-y-2">
+                <h1 className={`text-4xl font-black tracking-tighter uppercase italic ${theme.text}`}>Identity Reset</h1>
+                <p className="text-[9px] font-black text-gray-500 uppercase tracking-[0.4em]">System Entry Restoration Protocol</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black uppercase tracking-widest text-gray-500 ml-1 text-center block">Account Email</label>
+                <div className="relative">
+                  <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
+                  <input 
+                    type="email" 
+                    placeholder="Enter Identifier..." 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className={`w-full py-5 pl-14 pr-8 rounded-2xl text-[11px] font-black tracking-[0.2em] uppercase outline-none transition-all border ${theme.input}`}
+                    required
+                  />
+                </div>
               </div>
 
               <button 
                 type="submit" 
-                className="btn-submit"
                 disabled={loading}
+                className="w-full bg-black dark:bg-amber-600 text-white dark:text-black py-6 rounded-2xl font-black text-[11px] uppercase tracking-[0.5em] transition-all active:scale-[0.98] shadow-2xl hover:shadow-amber-500/20 flex items-center justify-center gap-3 group"
               >
-                {loading ? (
-                  <>
-                    <span className="spinner"></span>
-                    Sending Reset Link...
-                  </>
-                ) : 'Send Reset Link'}
+                {loading ? 'Transmitting...' : 'Dispatch Reset Link'} 
+                <ArrowRight size={18} strokeWidth={3} className="group-hover:translate-x-1 transition-transform" />
               </button>
-
-              <div className="form-footer">
-                <p>
-                  Remember your password?{' '}
-                  <Link to="/login" className="login-link">Back to Login</Link>
-                </p>
-              </div>
             </form>
-          ) : (
-            <div className="email-sent-message">
-              <div className="success-icon">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                  <polyline points="22 4 12 14.01 9 11.01" />
-                </svg>
-              </div>
-              <h2>Check Your Email</h2>
-              <p className="email-sent-text">
-                We've sent a password reset link to:
-                <strong>{email}</strong>
-              </p>
-              <p className="instruction-text">
-                Click the link in the email to reset your password. The link will expire in 15 minutes.
-              </p>
-              
-              <div className="email-actions">
-                <button 
-                  type="button" 
-                  className="btn-secondary"
-                  onClick={() => setEmailSent(false)}
-                >
-                  Try another email
-                </button>
-                <Link to="/login" className="btn-primary">
-                  Back to Login
-                </Link>
-              </div>
-
-              <div className="email-tips">
-                <h3>Didn't receive the email?</h3>
-                <ul>
-                  <li>Check your spam or junk folder</li>
-                  <li>Make sure you entered the correct email address</li>
-                  <li>Try requesting a new reset link</li>
-                  <li>Contact support if you continue to have issues</li>
-                </ul>
-              </div>
+          </div>
+        ) : (
+          /* SUCCESS STATE */
+          <div className="text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center border-2 border-dashed ${isDark ? 'border-amber-500/30 bg-amber-500/5' : 'border-amber-500 bg-amber-50'}`}>
+              <CheckCircle2 className="text-amber-500" size={40} strokeWidth={1.5} />
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+            
+            <div className="space-y-3">
+              <h2 className={`text-4xl font-black tracking-tighter uppercase italic ${theme.text}`}>Dispatch Complete</h2>
+              <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em] leading-relaxed">
+                Reset instructions transmitted to: <br />
+                <span className="text-amber-500 font-black">{email}</span>
+              </p>
+            </div>
+
+            <div className={`p-6 rounded-3xl border text-left space-y-4 ${isDark ? 'bg-white/5 border-white/5' : 'bg-gray-50 border-gray-100'}`}>
+              <h3 className="text-[10px] font-black uppercase text-amber-500 tracking-widest flex items-center gap-2">
+                <RefreshCw size={12} /> Next Actions
+              </h3>
+              <ul className="text-[9px] font-bold text-gray-500 uppercase tracking-widest space-y-3">
+                <li className="flex items-start gap-3"><span className="text-amber-500">01.</span> Check spam or junk hierarchy.</li>
+                <li className="flex items-start gap-3"><span className="text-amber-500">02.</span> Use the link within 15 minutes.</li>
+                <li className="flex items-start gap-3"><span className="text-amber-500">03.</span> Keep this window open until complete.</li>
+              </ul>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              <button 
+                onClick={() => setEmailSent(false)}
+                className={`w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest border transition-all ${isDark ? 'border-white/5 hover:bg-white/5' : 'border-gray-200 hover:bg-gray-50'}`}
+              >
+                Retry Different Email
+              </button>
+              <Link to="/login" className="text-[10px] font-black text-amber-500 uppercase tracking-[0.3em] hover:underline">
+                Authenticate Now
+              </Link>
+            </div>
+          </div>
+        )}
+
+        <footer className="mt-20 text-center opacity-30">
+          <p className="text-[8px] font-black uppercase tracking-[0.5em] text-gray-500 italic">Essential Concierge • Secure Restoration</p>
+        </footer>
+      </section>
+    </main>
   );
 };
 

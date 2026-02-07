@@ -1,415 +1,181 @@
-// ProductDetail.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { cartService } from '../services/cartService';
 import { isAuthenticated } from '../utils/auth';
-import '../Stylesheet/ProductDetail.css';
+import { 
+  ChevronLeft, ShoppingBag, Zap, ShieldCheck, 
+  Minus, Plus, Info 
+} from 'lucide-react';
 
 const ProductDetail = () => {
-    const [searchParams] = useSearchParams();
-    const Id = searchParams.get("id");
-    const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const Id = searchParams.get("id");
+  const navigate = useNavigate();
+  const isDark = useSelector((state) => state.theme.isDark);
 
-    const [product, setProduct] = useState(null);
-    const [selectedSize, setSelectedSize] = useState('');
-    const [selectedColor, setSelectedColor] = useState('');
-    const [quantity, setQuantity] = useState(1);
-    const [isAdding, setIsAdding] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+  const [product, setProduct] = useState(null);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (!Id) {
-            toast.error('Product ID is missing');
-            navigate('/products');
-            return;
+  useEffect(() => {
+    if (!Id) { navigate('/products'); return; }
+    const fetchDetail = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`http://localhost:8000/api/products/${Id}`);
+        const data = await res.json();
+        if (data?.success && data?.data) {
+          setProduct(data.data);
+          if (data.data.sizes?.length > 0) setSelectedSize(data.data.sizes[0]);
+          if (data.data.colors?.length > 0) setSelectedColor(data.data.colors[0]);
         }
-
-        const fetchDetail = async () => {
-            try {
-                setLoading(true);
-                const res = await fetch(`http://localhost:8000/api/products/${Id}`);
-                
-                if (!res.ok) {
-                    throw new Error('Failed to fetch product');
-                }
-                
-                const data = await res.json();
-
-                if (data?.success && data?.data) {
-                    const fetchedProduct = data.data;
-                    setProduct(fetchedProduct);
-                    
-                    // Set default size if available
-                    if (fetchedProduct.sizes && fetchedProduct.sizes.length > 0) {
-                        setSelectedSize(fetchedProduct.sizes[0]);
-                    }
-                    
-                    // Set default color if available
-                    if (fetchedProduct.colors && fetchedProduct.colors.length > 0) {
-                        setSelectedColor(fetchedProduct.colors[0]);
-                    }
-                } else {
-                    toast.error('Product not found');
-                    setTimeout(() => navigate('/products'), 2000);
-                }
-            } catch (err) {
-                console.error('Product fetch error:', err);
-                setError('Unable to load product details');
-                toast.error('Failed to load product. Redirecting...');
-                setTimeout(() => navigate('/products'), 2000);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDetail();
-    }, [Id, navigate]);
-
-    const handleAddToCart = async () => {
-        // Check if user is authenticated
-        if (!isAuthenticated()) {
-            toast.warning('Please login to add items to cart');
-            setTimeout(() => navigate('/login'), 1500);
-            return;
-        }
-
-        // Check if product exists
-        if (!product) {
-            toast.error('Product not found');
-            return;
-        }
-
-        // Validate product is active
-        if (!product.isActive) {
-            toast.error('This product is currently unavailable');
-            return;
-        }
-
-        // Validate stock
-        if (product.stock < quantity) {
-            toast.warning(`Only ${product.stock} items available in stock`);
-            return;
-        }
-
-        // Validate size selection if required
-        if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-            toast.warning('Please select a size');
-            return;
-        }
-
-        try {
-            setIsAdding(true);
-            
-            const response = await cartService.addToCart(
-                product._id,
-                quantity,
-                selectedSize || undefined,
-                selectedColor || undefined
-            );
-
-            // Success feedback
-            toast.success(`${product.name} added to cart!`, {
-                position: "top-right",
-                autoClose: 2000,
-            });
-            
-            console.log('Cart updated:', response.data);
-
-        } catch (err) {
-            console.error('Add to cart error:', err);
-            
-            // Handle specific error messages from backend
-            if (err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err.message) {
-                toast.error(err.message);
-            } else {
-                toast.error('Failed to add item to cart. Please try again.');
-            }
-        } finally {
-            setIsAdding(false);
-        }
+      } catch (err) {
+        toast.error('Identity fetch failed');
+      } finally { setLoading(false); }
     };
+    fetchDetail();
+  }, [Id, navigate]);
 
-    const handleDirectBuy = async () => {
-        // Check if user is authenticated
-        if (!isAuthenticated()) {
-            toast.warning('Please login to proceed with checkout');
-            setTimeout(() => navigate('/login'), 1500);
-            return;
-        }
+  const handleAddToCart = async (btn = 'cart') => {
+    if (!isAuthenticated()) { toast.warning('Authentication Required'); navigate('/login'); return; }
+    try {
+      setIsAdding(true);
+      await cartService.addToCart(product._id, quantity, selectedSize, selectedColor);
+      if(btn === 'shoping')
+      {
+        navigate('/checkout')
+      }
+      toast.success('Secured in Bag');
+    } catch (err) {
+      toast.error('Error');
+    } finally { setIsAdding(false); }
+  };
 
-        // Check if product exists
-        if (!product) {
-            toast.error('Product not found');
-            return;
-        }
+  const theme = isDark 
+    ? { bg: 'bg-[#050505]', text: 'text-white', card: 'bg-[#111] border-white/5' }
+    : { bg: 'bg-[#fafafa]', text: 'text-black', card: 'bg-white border-gray-100 shadow-xl' };
 
-        // Validate product is active
-        if (!product.isActive) {
-            toast.error('This product is currently unavailable');
-            return;
-        }
+  if (loading) return <div className={`h-screen w-full flex items-center justify-center ${theme.bg}`}><p className="animate-pulse text-amber-500 font-black uppercase text-[10px] tracking-[0.5em]">Loading Archive...</p></div>;
+  if (!product) return null;
 
-        // Validate stock
-        if (product.stock < quantity) {
-            toast.warning(`Only ${product.stock} items available in stock`);
-            return;
-        }
+  const discountedPrice = product.price * (1 - (product.discount / 100));
 
-        // Validate size selection if required
-        if (product.sizes && product.sizes.length > 0 && !selectedSize) {
-            toast.warning('Please select a size');
-            return;
-        }
-
-        // Add to cart first, then navigate to checkout
-        try {
-            setIsAdding(true);
-            
-            await cartService.addToCart(
-                product._id,
-                quantity,
-                selectedSize || undefined,
-                selectedColor || undefined
-            );
-
-            toast.success('Redirecting to checkout...', {
-                autoClose: 1000,
-            });
-
-            // Navigate to checkout after a short delay
-            setTimeout(() => navigate('/checkout'), 1000);
-
-        } catch (err) {
-            console.error('Direct buy error:', err);
-            
-            if (err.response?.data?.message) {
-                toast.error(err.response.data.message);
-            } else if (err.message) {
-                toast.error(err.message);
-            } else {
-                toast.error('Failed to proceed. Please try again.');
-            }
-            
-            setIsAdding(false);
-        }
-    };
-
-    const handleQuantityChange = (change) => {
-        const newQuantity = quantity + change;
+  return (
+    <main className={`relative w-full ${theme.bg} ${theme.text} transition-colors duration-700 font-sans overflow-x-hidden
+      lg:h-screen lg:overflow-hidden` /* Lock screen on Laptop */
+    }>
+      
+      {/* Scrollable Container for Mobile, Grid for Desktop */}
+      <div className="flex flex-col lg:flex-row h-full w-full pt-24 lg:pt-0">
         
-        if (newQuantity < 1) {
-            return;
-        }
-        
-        if (!product) return;
-        
-        if (newQuantity > product.stock) {
-            toast.warning(`Only ${product.stock} items available in stock`);
-            return;
-        }
-        
-        setQuantity(newQuantity);
-    };
-
-    if (loading) {
-        return (
-            <div className="PDP-Loading">
-                <div className="PDP-Spinner"></div>
-                <p>Loading product details...</p>
-            </div>
-        );
-    }
-
-    if (error || !product) {
-        return (
-            <div className="PDP-Error">
-                <div className="PDP-Error-Icon">
-                    <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                </div>
-                <h2>{error || 'Product Not Found'}</h2>
-                <p>The product you're looking for doesn't exist or has been removed.</p>
-                <button className="PDP-Error-Btn" onClick={() => navigate('/products')}>
-                    Back to Products
-                </button>
-            </div>
-        );
-    }
-
-    const discountedPrice = product.price * (1 - (product.discount / 100));
-
-    return (
-        <div className="PDP-Hero-Container">
-            <button className="PDP-BackBtn" onClick={() => navigate(-1)}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M19 12H5M5 12L12 19M5 12L12 5" />
-                </svg>
-                <span>Back</span>
+        {/* LEFT: IMAGE SECTION (Fixed 100vh on Laptop) */}
+        <section className="w-full lg:w-1/2 h-[60vh] lg:h-full p-4 lg:p-12 flex items-center justify-center">
+          <div className={`relative w-full h-full rounded-[2.5rem] overflow-hidden border ${theme.card}`}>
+            <img 
+              src={product.images?.[0]} 
+              alt={product.name} 
+              className="w-full h-full object-cover" 
+            />
+            <button 
+              onClick={() => navigate(-1)} 
+              className="absolute top-6 left-6 p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-amber-600 transition-all"
+            >
+              <ChevronLeft size={20} strokeWidth={3} />
             </button>
+          </div>
+        </section>
 
-            <div className="PDP-Split-Layout">
-                <section className="PDP-Image-Section">
-                    {product.images && product.images.length > 0 ? (
-                        <img src={product.images[0]} alt={product.name} />
-                    ) : (
-                        <div className="PDP-Image-Placeholder">
-                            No Image Available
-                        </div>
-                    )}
-                </section>
-
-                <section className="PDP-Content-Section">
-                    <div className="PDP-Content-Wrapper">
-                        <span className="PDP-Brand-Label">{product.brand || 'Unknown Brand'}</span>
-                        <h1 className="PDP-Main-Title">{product.name || 'Unnamed Product'}</h1>
-
-                        <div className="PDP-Price-Group">
-                            <span className="PDP-Current-Price">₹{discountedPrice.toFixed(0)}</span>
-                            {product.discount > 0 && (
-                                <>
-                                    <span className="PDP-Old-Price">₹{product.price}</span>
-                                    <span className="PDP-Discount-Badge">
-                                        {product.discount}% OFF
-                                    </span>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Stock Status */}
-                        <div className="PDP-Stock-Status">
-                            {product.stock > 0 ? (
-                                <span className="in-stock">
-                                    ✓ In Stock ({product.stock} available)
-                                </span>
-                            ) : (
-                                <span className="out-of-stock">✗ Out of Stock</span>
-                            )}
-                        </div>
-
-                        <p className="PDP-Brief">{product.description}</p>
-
-                        {/* Size Selection */}
-                        {product.sizes && product.sizes.length > 0 && (
-                            <div className="PDP-Selection-Area">
-                                <span className="PDP-Sub-Label">
-                                    Select Size {selectedSize && `(${selectedSize})`}
-                                </span>
-                                <div className="PDP-Size-Grid">
-                                    {product.sizes.map((size) => (
-                                        <button
-                                            key={size}
-                                            className={`PDP-Size-Button ${selectedSize === size ? 'active' : ''}`}
-                                            onClick={() => setSelectedSize(size)}
-                                            type="button"
-                                        >
-                                            {size}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Color Selection */}
-                        {product.colors && product.colors.length > 0 && (
-                            <div className="PDP-Selection-Area">
-                                <span className="PDP-Sub-Label">
-                                    Select Color {selectedColor && `(${selectedColor})`}
-                                </span>
-                                <div className="PDP-Color-Grid">
-                                    {product.colors.map((color) => (
-                                        <button
-                                            key={color}
-                                            className={`PDP-Color-Button ${selectedColor === color ? 'active' : ''}`}
-                                            onClick={() => setSelectedColor(color)}
-                                            style={{ 
-                                                backgroundColor: color.toLowerCase(),
-                                                border: selectedColor === color ? '3px solid #121212' : '1px solid #eee'
-                                            }}
-                                            title={color}
-                                            type="button"
-                                        >
-                                            {selectedColor === color && '✓'}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Quantity Selector */}
-                        <div className="PDP-Quantity-Row">
-                            <span className="PDP-Sub-Label">Quantity</span>
-                            <div className="PDP-Quantity-Selector">
-                                <button 
-                                    onClick={() => handleQuantityChange(-1)}
-                                    disabled={quantity <= 1}
-                                    type="button"
-                                >
-                                    —
-                                </button>
-                                <span>{quantity}</span>
-                                <button 
-                                    onClick={() => handleQuantityChange(1)}
-                                    disabled={quantity >= product.stock}
-                                    type="button"
-                                >
-                                    +
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="PDP-Action-Stack">
-                            <button
-                                className={`PDP-Add-Cart-Btn ${isAdding ? 'loading' : ''}`}
-                                onClick={handleAddToCart}
-                                disabled={isAdding || product.stock === 0}
-                                type="button"
-                            >
-                                {isAdding ? 'Adding...' : product.stock === 0 ? 'Out of Stock' : 'Add to Bag'}
-                            </button>
-
-                            <button 
-                                className="PDP-Direct-Buy-Btn" 
-                                onClick={handleDirectBuy}
-                                disabled={isAdding || product.stock === 0}
-                                type="button"
-                            >
-                                Buy It Now
-                            </button>
-                        </div>
-
-                        {/* Product Info */}
-                        <div className="PDP-Product-Info">
-                            <p><strong>Category:</strong> {product.category}</p>
-                            <p><strong>Gender:</strong> {product.gender}</p>
-                            {product.rating > 0 && (
-                                <p>
-                                    <strong>Rating:</strong> ⭐ {product.rating.toFixed(1)} 
-                                    ({product.reviewsCount} reviews)
-                                </p>
-                            )}
-                        </div>
-
-                        {/* Additional Info if available */}
-                        <div className="PDP-Additional-Info">
-                            {product.isActive === false && (
-                                <p className="inactive-warning">
-                                    ⚠️ This product is currently inactive and cannot be purchased.
-                                </p>
-                            )}
-                        </div>
-                    </div>
-                </section>
+        {/* RIGHT: CONTENT SECTION (Scrollable internally on Laptop if needed) */}
+        <section className="w-full  lg:w-1/2 h-auto lg:h-full  custom-scrollbar p-6 lg:p-20 flex flex-col justify-center">
+          <div className="max-w-xl space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
+            
+            <div className="space-y-3">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500">Edition 2026</span>
+              <h1 className="text-4xl lg:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">
+                {product.name}
+              </h1>
+              <div className="flex items-center gap-4 text-3xl font-black tracking-tighter">
+                <span>₹{discountedPrice.toLocaleString()}</span>
+                {product.discount > 0 && (
+                  <span className="text-sm text-gray-500 line-through opacity-40 italic">₹{product.price.toLocaleString()}</span>
+                )}
+              </div>
             </div>
-        </div>
-    );
+
+            <p className="text-xs lg:text-sm font-medium leading-relaxed opacity-60 uppercase tracking-tight line-clamp-3">
+              {product.description}
+            </p>
+
+            {/* Selection Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 py-6 border-y border-amber-500/10">
+              {/* Sizes */}
+              <div className="space-y-3">
+                <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Size Hierarchy</h5>
+                <div className="flex flex-wrap gap-2">
+                  {product.sizes?.map(size => (
+                    <button 
+                      key={size} 
+                      onClick={() => setSelectedSize(size)}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase transition-all border ${selectedSize === size ? 'bg-amber-600 border-amber-600 text-black shadow-lg' : 'border-white/10 hover:border-white/40'}`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Quantity */}
+              <div className="space-y-3">
+                <h5 className="text-[10px] font-black uppercase tracking-widest text-gray-500">Volume</h5>
+                <div className="inline-flex items-center gap-6 px-4 py-2 rounded-xl border border-white/10">
+                  <button onClick={() => setQuantity(q => Math.max(1, q-1))}><Minus size={14}/></button>
+                  <span className="text-xs font-black">{quantity}</span>
+                  <button onClick={() => setQuantity(q => Math.min(product.stock, q+1))}><Plus size={14}/></button>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={handleAddToCart}
+                disabled={isAdding || product.stock === 0}
+                className="flex-1 bg-white text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:bg-amber-500 transition-all active:scale-95"
+              >
+                Add to Bag
+              </button>
+              <button 
+              onClick={()=>handleAddToCart('shoping')}
+                className="flex-1 bg-amber-600 text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:bg-amber-500 transition-all active:scale-95 flex items-center justify-center gap-2"
+              >
+                <Zap size={14} fill="currentColor" /> Direct Entry
+              </button>
+            </div>
+
+            {/* Trust Footer */}
+            <div className={`p-6 rounded-[2rem] border ${theme.card} flex items-center justify-between`}>
+              <div className="flex items-center gap-3">
+                <ShieldCheck className="text-amber-500" size={18} />
+                <span className="text-[9px] font-black uppercase tracking-widest">Genuine Archive</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <Info className="text-amber-500" size={18} />
+                <span className={`text-[9px] font-black uppercase tracking-widest ${product.stock < 5 ? 'text-red-500' : 'text-green-500'}`}>
+                   Stock: {product.stock}
+                </span>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </div>
+    </main>
+  );
 };
 
 export default ProductDetail;

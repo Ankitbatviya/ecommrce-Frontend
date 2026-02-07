@@ -40,7 +40,7 @@ function Hero() {
               Explore Shop <ArrowUpRight size={16} />
             </button>
             <button 
-              onClick={() => navigate("/about")}
+              onClick={() => navigate("/aboutus")}
               className={`w-full sm:w-auto px-10 py-5 font-black text-xs uppercase tracking-widest transition-all ${isDark ? 'text-white hover:text-amber-500' : 'text-black hover:text-amber-600'}`}
             >
               Our Story —
