@@ -45,20 +45,20 @@ function Layout() {
     '/productdetail',
     '/cart',
     '/checkout',
-    '/orders',
-    '/order/:id',
     '/order-confirmation',
-    '/admin'
+    '/admin' // Added this to hide navbar on ALL admin routes
   ]
 
   // Handle dynamic routes correctly
   const hideNavbar = routesWithoutNav.some(route => {
     if (route.includes(':')) {
-      // Handle dynamic routes like /order/:id
-      const routePattern = new RegExp('^' + route.replace(/:\w+/g, '[^/]+') + '$');
-      return routePattern.test(location.pathname);
+      // Handle dynamic routes
+      const routePattern = new RegExp('^' + route.replace(/:\w+/g, '[^/]+') + '$')
+      return routePattern.test(location.pathname)
     }
-    return location.pathname.startsWith(route);
+    
+    // Check if current path starts with the route (for admin/* routes)
+    return location.pathname.startsWith(route)
   })
 
   return (
@@ -75,7 +75,7 @@ function Layout() {
         <Route path='/signup' element={<SignUp />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password/:token' element={<ResetPassword />} />
-        <Route path='/productdetail' element={<ProductDetail />} />
+        <Route path='/productdetail/:id' element={<ProductDetail />} /> {/* Fixed: added :id parameter */}
         
         {/* Legal/Policy Pages */}
         <Route path='/terms' element={<TermsConditions />} />
@@ -152,7 +152,6 @@ function Layout() {
           </ProtectedRoute>
         } />
 
-        
         {/* ===================== 404 ROUTE ===================== */}
         <Route path="*" element={
           <div style={{ 

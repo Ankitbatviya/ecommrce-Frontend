@@ -19,15 +19,58 @@ const Login = () => {
         email: formData.email,
         password: formData.password
       });
+      
       if (response.data.success) {
-        Cookies.set('authToken', response.data.token, { expires: 7, path: '/' });
-        Cookies.set('userInfo', JSON.stringify(response.data.user), { expires: 7, path: '/' });
+        // Determine if we're in production (Vercel)
+        const isProduction = window.location.hostname.includes('vercel.app') || 
+                            process.env.NODE_ENV === 'production';
+        
+        // Cookie configuration for production vs development
+        const cookieOptions = {
+          expires: 7, // 7 days
+          path: '/',
+          sameSite: 'lax',
+          secure: isProduction, // true for Vercel (HTTPS)
+        };
+        
+        // Add domain for Vercel production
+        if (isProduction) {
+          cookieOptions.domain = window.location.hostname.includes('vercel.app') 
+            ? '.vercel.app' 
+            : window.location.hostname;
+        }
+        
+        // Set all cookies with proper options
+        Cookies.set('authToken', response.data.token, cookieOptions);
+        Cookies.set('userInfo', JSON.stringify(response.data.user), cookieOptions);
+        Cookies.set('userRole', response.data.user.role || 'user', cookieOptions);
+        
+        console.log('Cookies set for:', {
+          domain: cookieOptions.domain,
+          secure: cookieOptions.secure,
+          isProduction,
+          hostname: window.location.hostname
+        });
+        
+        // Also set to localStorage as backup
+        localStorage.setItem('authToken', response.data.token);
+        localStorage.setItem('userInfo', JSON.stringify(response.data.user));
+        localStorage.setItem('userRole', response.data.user.role || 'user');
+        
         toast.success(`Access Granted: ${response.data.user.fullname}`);
-        setTimeout(() => { window.location.href = response.data.redirectTo; }, 1000);
+        
+        // Redirect with slight delay
+        setTimeout(() => { 
+          window.location.href = response.data.redirectTo || 
+            (response.data.user.role === 'admin' ? '/admin/dashboard' : '/');
+        }, 1000);
       }
     } catch (err) {
-      toast.error('Identity Verification Failed');
-    } finally { setLoading(false); }
+      toast.error(err.response?.data?.message || 'Identity Verification Failed');
+      console.error('Login error:', err);
+    } finally { 
+      setLoading(false); 
+    }
   };
 
   const isAdminEmail = formData.email.toLowerCase() === 'ankitbatviya94@gmail.com';
@@ -37,6 +80,20 @@ const Login = () => {
     ? 'bg-black/40 border-white/5 text-white focus:border-amber-500 focus:bg-black/60' 
     : 'bg-white border-gray-100 text-black focus:border-black focus:shadow-xl'
   }`;
+
+  // Debug function to check current cookies
+  const debugCookies = () => {
+    console.log('=== Current Cookie Debug ===');
+    console.log('Cookies by js-cookie:', {
+      authToken: Cookies.get('authToken') ? 'Exists' : 'Missing',
+      userInfo: Cookies.get('userInfo') ? 'Exists' : 'Missing',
+      userRole: Cookies.get('userRole') ? Cookies.get('userRole') : 'Missing'
+    });
+    console.log('Document cookies:', document.cookie);
+    console.log('Hostname:', window.location.hostname);
+    console.log('Protocol:', window.location.protocol);
+    console.log('Environment:', process.env.NODE_ENV);
+  };
 
   return (
     <main className={`relative min-h-screen w-full flex items-center justify-center overflow-hidden transition-colors duration-700 ${isDark ? 'bg-[#050505]' : 'bg-[#fafafa]'}`}>
@@ -50,6 +107,14 @@ const Login = () => {
         />
         <div className={`absolute inset-0 ${isDark ? 'bg-gradient-to-t from-black via-transparent to-black' : 'bg-gradient-to-t from-white via-transparent to-white'}`} />
       </div>
+
+      {/* Debug button (remove in production) */}
+      <button 
+        onClick={debugCookies}
+        className="fixed top-4 right-4 z-50 text-xs bg-red-500 text-white px-2 py-1 rounded opacity-50 hover:opacity-100"
+      >
+        Debug Cookies
+      </button>
 
       <section className="relative z-10 w-full max-w-lg px-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
         <button onClick={() => window.history.back()} className="mb-16 flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] opacity-40 hover:opacity-100 transition-all mx-auto group">
