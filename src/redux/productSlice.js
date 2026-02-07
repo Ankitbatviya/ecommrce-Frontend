@@ -3,10 +3,17 @@ import axios from 'axios';
 
 // Async Thunk to fetch products from API
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
-  const response = await axios.get('http://localhost:8000/api/products');
-  return response.data.data || response.data;
-});
+  try {
+    const response = await axios.get('https://ecommrce-backend-1.onrender.com/api/products');
 
+    return response.data.data || []; // Return the array of products
+  } catch (error) {
+    console.error('Error fetching products:', error);
+
+    // Throw error so Redux can handle it properly
+    throw new Error(error.response?.data?.message || 'Failed to fetch products');
+  }
+});
 const productSlice = createSlice({
   name: 'products',
   initialState: {

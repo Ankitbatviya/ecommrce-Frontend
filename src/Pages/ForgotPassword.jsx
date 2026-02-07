@@ -20,7 +20,7 @@ const ForgotPassword = () => {
     setLoading(true);
     try {
       // Adjust this URL to your actual backend endpoint
-      const response = await axios.post('http://localhost:8000/api/auth/forgot-password', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/forgot-password`, {
         email: email
       });
 

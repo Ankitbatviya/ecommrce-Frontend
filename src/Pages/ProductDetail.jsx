@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
-import api from '../config/api';
 import { cartService } from '../services/cartService';
 import { isAuthenticated } from '../utils/auth';
 import { 
@@ -28,14 +27,15 @@ const ProductDetail = () => {
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const res = await api.get(`/products/${Id}`);
-        if (res.data?.success && res.data?.data) {
-          setProduct(res.data.data);
-          if (res.data.data.sizes?.length > 0) setSelectedSize(res.data.data.sizes[0]);
-          if (res.data.data.colors?.length > 0) setSelectedColor(res.data.data.colors[0]);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${Id}`);
+        const data = await res.json();
+        if (data?.success && data?.data) {
+          setProduct(data.data);
+          if (data.data.sizes?.length > 0) setSelectedSize(data.data.sizes[0]);
+          if (data.data.colors?.length > 0) setSelectedColor(data.data.colors[0]);
         }
       } catch (err) {
-        toast.error(err.response?.data?.message || 'Identity fetch failed');
+        toast.error('Identity fetch failed');
       } finally { setLoading(false); }
     };
     fetchDetail();
@@ -52,7 +52,7 @@ const ProductDetail = () => {
       }
       toast.success('Secured in Bag');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Error');
+      toast.error('Error');
     } finally { setIsAdding(false); }
   };
 
