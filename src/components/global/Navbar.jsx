@@ -166,6 +166,7 @@ function Navbar() {
                   <div className="grid grid-cols-2 gap-2">
                     <button onClick={() => {navigate('/profile'); setIsMenuOpen(false);}} className={`p-4 rounded-xl text-[10px] font-black uppercase transition-all ${isDark ? 'bg-white/10 text-white border border-white/5' : 'bg-white text-gray-700 border border-gray-200 shadow-sm'}`}>Profile</button>
                     <button onClick={() => {navigate('/orders'); setIsMenuOpen(false);}} className={`p-4 rounded-xl text-[10px] font-black uppercase transition-all ${isDark ? 'bg-white/10 text-white border border-white/5' : 'bg-white text-gray-700 border border-gray-200 shadow-sm'}`}>Orders</button>
+                    <button onClick={() => {navigate('/admin/dashboard'); setIsMenuOpen(false);}} className={`p-4 rounded-xl text-[10px] font-black uppercase transition-all ${isDark ? 'bg-white/10 text-white border border-white/5' : 'bg-white text-gray-700 border border-gray-200 shadow-sm'}`}>dashboard</button>
                   </div>
                   <button onClick={handleLogout} className="w-full p-4 bg-red-500/10 text-red-500 border border-red-500/20 rounded-xl text-[10px] font-black uppercase active:scale-95 transition-all">Terminate Session</button>
                 </>
