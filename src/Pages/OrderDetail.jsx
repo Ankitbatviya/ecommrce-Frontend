@@ -1,14 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { orderService } from '../services/orderService';
-import { 
-  ChevronLeft, Package, MapPin, CreditCard, 
-  Trash2, Download, Truck, Calendar, 
-  MessageSquare, ShoppingBag, Loader2, X, 
+import {
+  ChevronLeft,
+  ShoppingBag,
+  MapPin,
+  CreditCard,
+  Trash2,
+  Download,
+  Loader2,
+  X,
   Clock,
-  CheckCircle2
+  CheckCircle2,
+  XCircle
 } from 'lucide-react';
 
 const OrderDetail = () => {
@@ -22,205 +28,203 @@ const OrderDetail = () => {
   const [cancelReason, setCancelReason] = useState('');
   const [showCancelForm, setShowCancelForm] = useState(false);
 
-  useEffect(() => {
-    fetchOrder();
-  }, [id]);
+  /* ---------------- FETCH ORDER ---------------- */
+  const fetchOrder = useCallback(async () => {
+    if (!id) {
+      toast.error('Invalid Order ID');
+      return navigate('/orders');
+    }
 
-  const fetchOrder = async () => {
     try {
       setLoading(true);
-      const response = await orderService.getOrderById(id);
-      if (response.success) {
-        setOrder(response.data);
-      } else {
-        toast.error('Manifest not found');
-        navigate('/orders');
+      const res = await orderService.getOrderById(id);
+
+      if (!res?.success || !res.data) {
+        throw new Error('Order not found');
       }
+
+      setOrder(res.data);
     } catch (err) {
-      toast.error('Data retrieval failure');
+      toast.error('Failed to load order');
       navigate('/orders');
     } finally {
       setLoading(false);
     }
-  };
+  }, [id, navigate]);
 
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
+
+  /* ---------------- CANCEL ORDER ---------------- */
   const handleCancelOrder = async () => {
-    if (!cancelReason.trim()) return toast.error('Termination reason required');
+    if (!cancelReason.trim()) {
+      return toast.error('Cancellation reason required');
+    }
 
     try {
       setCancelling(true);
-      const response = await orderService.cancelOrder(id, cancelReason);
-      if (response.success) {
-        toast.success('Manifest Terminated');
-        setOrder(response.data);
+      const res = await orderService.cancelOrder(id, cancelReason);
+
+      if (res?.success) {
+        toast.success('Order cancelled');
+        setOrder(res.data);
         setShowCancelForm(false);
       }
-    } catch (err) {
-      toast.error('Termination failed');
+    } catch {
+      toast.error('Cancellation failed');
     } finally {
       setCancelling(false);
     }
   };
 
-  const theme = isDark 
-    ? { bg: 'bg-[#050505]', text: 'text-white', card: 'bg-[#111] border-white/5', sub: 'text-gray-500' }
-    : { bg: 'bg-[#fafafa]', text: 'text-black', card: 'bg-white border-gray-100 shadow-xl', sub: 'text-gray-400' };
+  /* ---------------- THEME ---------------- */
+  const theme = isDark
+    ? { bg: 'bg-[#050505]', text: 'text-white', card: 'bg-[#111] border-white/5' }
+    : { bg: 'bg-[#fafafa]', text: 'text-black', card: 'bg-white border-gray-100 shadow-xl' };
 
-  if (loading) return (
-    <div className={`min-h-screen flex flex-col items-center justify-center gap-4 ${theme.bg}`}>
-      <Loader2 className="animate-spin text-amber-500" size={32} />
-      <p className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-500">Decrypting Manifest...</p>
-    </div>
-  );
+  /* ---------------- LOADING ---------------- */
+  if (loading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${theme.bg}`}>
+        <Loader2 size={32} className="animate-spin text-amber-500" />
+      </div>
+    );
+  }
 
   if (!order) return null;
 
+  const safe = (n) => Number(n || 0).toLocaleString();
+
   return (
-    <main className={`min-h-screen ${theme.bg} ${theme.text} pt-28 pb-20 transition-colors duration-700 font-sans`}>
+    <main className={`min-h-screen ${theme.bg} ${theme.text} pt-28 pb-20`}>
       <div className="max-w-6xl mx-auto px-6">
-        
-        {/* Navigation Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12 animate-in fade-in slide-in-from-top-4 duration-700">
-          <div className="space-y-2">
-            <button onClick={() => navigate('/orders')} className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-40 hover:opacity-100 transition-all mb-2 group">
-              <ChevronLeft size={14} strokeWidth={3} className="group-hover:-translate-x-1 transition-transform" /> Return to Archives
-            </button>
-            <h1 className="text-4xl md:text-5xl font-black tracking-tighter uppercase italic leading-none">
-              Order <span className="font-serif not-italic font-light text-amber-600">Insight</span>
-            </h1>
-            <p className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.3em]">Protocol #{order.orderNumber || order._id.slice(-8).toUpperCase()}</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <StatusBadge status={order.orderStatus} />
-          </div>
+
+        {/* HEADER */}
+        <div className="mb-12">
+          <button
+            onClick={() => navigate('/orders')}
+            className="flex items-center gap-2 text-[10px] uppercase tracking-widest opacity-40 hover:opacity-100"
+          >
+            <ChevronLeft size={14} /> Back to Orders
+          </button>
+
+          <h1 className="text-4xl font-black uppercase italic mt-2">
+            Order <span className="text-amber-600 font-light not-italic">Insight</span>
+          </h1>
+
+          <p className="text-[10px] uppercase tracking-widest text-gray-500">
+            #{order.orderNumber || order._id.slice(-8).toUpperCase()}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          
-          {/* LEFT COLUMN: ITEMS & TIMELINE */}
-          <div className="lg:col-span-8 space-y-12 animate-in fade-in slide-in-from-left-4 duration-700">
-            
-            {/* ITEM MANIFEST */}
+        <div className="grid lg:grid-cols-12 gap-12">
+
+          {/* LEFT */}
+          <div className="lg:col-span-8 space-y-12">
+
+            {/* ITEMS */}
             <section className={`p-8 rounded-[2.5rem] border ${theme.card}`}>
-              <h2 className="text-xs font-black uppercase tracking-[0.3em] text-amber-500 mb-8 flex items-center gap-3">
-                <ShoppingBag size={16} /> Manifest Entities ({order.items?.length})
-              </h2>
+              <h3 className="text-xs uppercase tracking-widest text-amber-500 mb-8 flex gap-2">
+                <ShoppingBag size={16} /> Items
+              </h3>
+
               <div className="space-y-8">
-                {order.items?.map((item, index) => (
-                  <div key={index} className="flex gap-6 items-center group">
-                    <div className="w-20 h-24 rounded-2xl overflow-hidden bg-white/5 border border-white/5 shrink-0 shadow-lg">
-                      <img src={item.image || item.product?.images?.[0]} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" alt="" />
-                    </div>
-                    <div className="flex-grow space-y-1">
-                      <h4 className="text-[11px] font-black uppercase tracking-widest leading-none">{item.name}</h4>
-                      <p className="text-[9px] font-bold text-gray-500 uppercase italic">
-                        {item.size && `S:${item.size}`} {item.color && `• C:${item.color}`}
+                {order.items.map((item, i) => (
+                  <div key={i} className="flex gap-6">
+                    <img
+                      src={item.image || item.product?.images?.[0] || '/placeholder.png'}
+                      alt={item.name}
+                      className="w-20 h-24 rounded-2xl object-cover"
+                    />
+                    <div>
+                      <h4 className="text-[11px] font-black uppercase tracking-widest">
+                        {item.name}
+                      </h4>
+                      <p className="text-xs italic opacity-60">
+                        Qty {item.quantity} • ₹{safe(item.price * item.quantity)}
                       </p>
-                      <div className="flex items-center gap-4 pt-2">
-                        <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-white/5 rounded border border-white/5">Qty: {item.quantity}</span>
-                        <span className="text-xs font-black italic">₹{(item.price * item.quantity).toLocaleString()}</span>
-                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </section>
 
-            {/* KINETIC TIMELINE */}
+            {/* TIMELINE */}
             <section className={`p-8 rounded-[2.5rem] border ${theme.card}`}>
-               <h2 className="text-xs font-black uppercase tracking-[0.3em] text-amber-500 mb-10 flex items-center gap-3">
-                <Clock size={16} /> Progress Protocol
-              </h2>
-              <div className="relative pl-8 space-y-12 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[1px] before:bg-white/5">
-                <TimelineStep status="Placed" date={order.createdAt} active />
-                <TimelineStep status="Processing" active={['Processing', 'Shipped', 'Delivered'].includes(order.orderStatus)} />
-                <TimelineStep status="Shipped" active={['Shipped', 'Delivered'].includes(order.orderStatus)} />
-                <TimelineStep status="Delivered" active={order.orderStatus === 'Delivered'} last />
-                {order.orderStatus === 'Cancelled' && <TimelineStep status="Cancelled" active date={order.cancelledAt} isError last />}
+              <h3 className="text-xs uppercase tracking-widest text-amber-500 mb-8 flex gap-2">
+                <Clock size={16} /> Status
+              </h3>
+
+              <div className="space-y-8">
+                <TimelineStep label="Placed" active />
+                {order.orderStatus !== 'Cancelled' && (
+                  <>
+                    <TimelineStep label="Processing" active={['Processing','Shipped','Delivered'].includes(order.orderStatus)} />
+                    <TimelineStep label="Shipped" active={['Shipped','Delivered'].includes(order.orderStatus)} />
+                    <TimelineStep label="Delivered" active={order.orderStatus === 'Delivered'} />
+                  </>
+                )}
+                {order.orderStatus === 'Cancelled' && (
+                  <TimelineStep label="Cancelled" active error />
+                )}
               </div>
             </section>
           </div>
 
-          {/* RIGHT COLUMN: SUMMARY & ACTIONS */}
-          <aside className="lg:col-span-4 space-y-8 sticky top-32 h-fit animate-in fade-in slide-in-from-right-4 duration-700">
-            
-            {/* SETTLEMENT CARD */}
-            <section className={`p-8 rounded-[2.5rem] border ${theme.card} space-y-6 shadow-2xl`}>
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] border-b border-white/5 pb-4">Settlement Summary</h3>
-              <div className="space-y-3">
-                <SummaryRow label="Subtotal" value={`₹${order.subtotal.toLocaleString()}`} />
-                <SummaryRow label="Duty (18%)" value={`₹${order.tax.toLocaleString()}`} />
-                <SummaryRow label="Logistics" value={order.shippingCharge > 0 ? `₹${order.shippingCharge}` : 'FREE'} accent="text-green-500" />
-                <div className="flex justify-between items-end pt-4 border-t border-white/5">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Net Value</span>
-                  <span className="text-3xl font-black tracking-tighter italic">₹{order.totalAmount.toLocaleString()}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-3 p-3 bg-white/5 rounded-xl text-[9px] font-black uppercase tracking-widest opacity-60">
-                 <CreditCard size={14} className="text-amber-500" /> {order.paymentMethod} • {order.paymentStatus}
+          {/* RIGHT */}
+          <aside className="lg:col-span-4 space-y-8 sticky top-28">
+
+            {/* SUMMARY */}
+            <section className={`p-8 rounded-[2.5rem] border ${theme.card}`}>
+              <SummaryRow label="Subtotal" value={`₹${safe(order.subtotal)}`} />
+              <SummaryRow label="Tax" value={`₹${safe(order.tax)}`} />
+              <SummaryRow label="Shipping" value={order.shippingCharge ? `₹${safe(order.shippingCharge)}` : 'FREE'} />
+              <div className="mt-6 text-3xl font-black italic">
+                ₹{safe(order.totalAmount)}
               </div>
             </section>
 
-            {/* LOGISTICS CARD */}
-            <section className={`p-8 rounded-[2.5rem] border ${theme.card} space-y-4`}>
-              <h3 className="text-xs font-black uppercase tracking-[0.3em] flex items-center gap-3">
-                <MapPin size={16} className="text-amber-500" /> Destination
-              </h3>
-              <div className="text-[11px] font-bold uppercase tracking-widest leading-relaxed opacity-70">
-                <p className="text-amber-500 font-black mb-1">{order.shippingAddress?.fullName}</p>
-                <p>{order.shippingAddress?.addressLine1}</p>
-                <p>{order.shippingAddress?.city}, {order.shippingAddress?.state} - {order.shippingAddress?.pincode}</p>
-              </div>
-            </section>
-
-            {/* COMMAND BUTTONS */}
-            <div className="flex flex-col gap-4">
-              {(order.paymentStatus === 'Paid' || order.orderStatus === 'Delivered') && (
-                <button className="w-full py-5 bg-white text-black rounded-2xl font-black text-[10px] uppercase tracking-[0.4em] transition-all hover:bg-amber-500 active:scale-95 flex items-center justify-center gap-2">
-                  <Download size={14} strokeWidth={3} /> Get Invoice
-                </button>
-              )}
-              
-              {['Pending', 'Processing'].includes(order.orderStatus) && !showCancelForm && (
-                <button onClick={() => setShowCancelForm(true)} className="w-full py-5 border border-red-500/20 text-red-500 rounded-2xl font-black text-[10px] uppercase tracking-[0.4em] transition-all hover:bg-red-500 hover:text-white active:scale-95 flex items-center justify-center gap-2">
-                  <Trash2 size={14} strokeWidth={3} /> Terminate Order
-                </button>
-              )}
-            </div>
-
+            {/* ACTIONS */}
+            {['Pending','Processing'].includes(order.orderStatus) && (
+              <button
+                onClick={() => setShowCancelForm(true)}
+                className="w-full py-5 border border-red-500 text-red-500 rounded-2xl uppercase tracking-widest"
+              >
+                Cancel Order
+              </button>
+            )}
           </aside>
         </div>
       </div>
 
-      {/* TERMINATION MODAL */}
+      {/* CANCEL MODAL */}
       {showCancelForm && (
-        <div className="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-black/95 backdrop-blur-xl">
-          <div className="w-full max-w-md p-10 rounded-[3rem] border border-red-500/20 bg-[#0a0a0a] text-white animate-in zoom-in-95">
-             <div className="flex justify-between items-center mb-8">
-                <div className="flex items-center gap-3 text-red-500 uppercase font-black text-[10px] tracking-widest">
-                   <XCircle size={18} /> Termination protocol
-                </div>
-                <button onClick={() => setShowCancelForm(false)} className="opacity-40 hover:opacity-100"><X size={20}/></button>
-             </div>
-             <div className="space-y-6">
-                <div className="space-y-2">
-                   <h3 className="text-xl font-black uppercase italic tracking-tighter">Declare Reason</h3>
-                   <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">By terminating this manifest, you void all logistical progress. This action is irreversible.</p>
-                </div>
-                <textarea 
-                   value={cancelReason}
-                   onChange={(e) => setCancelReason(e.target.value)}
-                   className="w-full bg-white/5 border border-white/10 rounded-2xl p-5 text-xs font-bold uppercase tracking-widest outline-none focus:border-red-500 transition-all min-h-[120px]"
-                   placeholder="e.g. Change of intent, protocol violation..."
-                />
-                <button 
-                   onClick={handleCancelOrder}
-                   disabled={cancelling || !cancelReason.trim()}
-                   className="w-full py-5 bg-red-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] active:scale-95 transition-all shadow-xl shadow-red-600/20 disabled:opacity-20"
-                >
-                   {cancelling ? 'Terminating...' : 'Execute Termination'}
-                </button>
-             </div>
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+          <div className="bg-[#0a0a0a] p-10 rounded-[3rem] w-full max-w-md">
+            <div className="flex justify-between mb-6">
+              <span className="flex items-center gap-2 text-red-500 uppercase text-xs">
+                <XCircle size={16} /> Cancel Order
+              </span>
+              <button onClick={() => setShowCancelForm(false)}>
+                <X />
+              </button>
+            </div>
+
+            <textarea
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              className="w-full p-4 rounded-xl bg-white/5 border border-white/10"
+              placeholder="Reason..."
+            />
+
+            <button
+              onClick={handleCancelOrder}
+              disabled={cancelling}
+              className="w-full mt-6 py-4 bg-red-600 rounded-xl uppercase tracking-widest"
+            >
+              {cancelling ? 'Cancelling...' : 'Confirm'}
+            </button>
           </div>
         </div>
       )}
@@ -228,40 +232,22 @@ const OrderDetail = () => {
   );
 };
 
-// HELPER COMPONENTS
-const SummaryRow = ({ label, value, accent = '' }) => (
-  <div className="flex justify-between text-[10px] font-bold uppercase tracking-widest opacity-60">
+/* ---------------- HELPERS ---------------- */
+const SummaryRow = ({ label, value }) => (
+  <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-60">
     <span>{label}</span>
-    <span className={accent}>{value}</span>
+    <span>{value}</span>
   </div>
 );
 
-const TimelineStep = ({ status, date, active, isError, last }) => (
-  <div className="relative flex items-start gap-6 group">
-    <div className={`mt-1.5 w-6 h-6 rounded-full border-2 shrink-0 z-10 transition-all duration-700 flex items-center justify-center ${active ? (isError ? 'bg-red-500 border-red-500' : 'bg-amber-500 border-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.4)]') : 'bg-black border-white/10'}`}>
-       {active && !isError && <CheckCircle2 size={12} className="text-black" />}
-       {isError && <X size={12} className="text-white" />}
+const TimelineStep = ({ label, active, error }) => (
+  <div className="flex items-center gap-4">
+    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${active ? (error ? 'bg-red-500' : 'bg-amber-500') : 'bg-gray-700'}`}>
+      {active && !error && <CheckCircle2 size={12} />}
+      {error && <X size={12} />}
     </div>
-    <div className="space-y-1">
-      <h4 className={`text-[11px] font-black uppercase tracking-widest ${active ? 'text-white' : 'text-gray-600'}`}>{status}</h4>
-      {date && <p className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">{new Date(date).toLocaleDateString()}</p>}
-    </div>
+    <span className="text-xs uppercase tracking-widest">{label}</span>
   </div>
 );
-
-const StatusBadge = ({ status }) => {
-  const styles = {
-    Pending: 'bg-amber-500/10 text-amber-500 border-amber-500/20',
-    Processing: 'bg-blue-500/10 text-blue-500 border-blue-500/20',
-    Shipped: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20',
-    Delivered: 'bg-green-500 text-black border-green-500',
-    Cancelled: 'bg-red-500/10 text-red-500 border-red-500/20',
-  };
-  return (
-    <div className={`px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest border transition-all ${styles[status]}`}>
-       {status}
-    </div>
-  );
-};
 
 export default OrderDetail;

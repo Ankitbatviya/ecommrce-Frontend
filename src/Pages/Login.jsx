@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import api from '../api';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
 import { useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await axios.post('http://localhost:8000/api/users/login', {
+      const response = await api.post('/users/login', {
         email: formData.email,
         password: formData.password
       });
