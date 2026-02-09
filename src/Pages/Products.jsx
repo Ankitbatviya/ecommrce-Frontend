@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { fetchProducts } from '../redux/productSlice.js';
-import { ArrowRight, ChevronLeft, ChevronRight, SearchX, ShoppingBag } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, SearchX } from 'lucide-react';
 
 const CollectionPage = () => {
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ const CollectionPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Sidebar Filters */}
           <aside className="hidden lg:block lg:col-span-3 space-y-12 sticky top-36 h-fit">
-            <FilterSection title="Hierarchy" options={["All", "Apparel", "Footwear", "Jewelry" , "Electronics"]} active={activeCategory} setter={setActiveCategory} />
+            <FilterSection title="Hierarchy" options={["All", "Apparel", "Footwear", "Jewelry", "Electronics"]} active={activeCategory} setter={setActiveCategory} />
             <FilterSection title="Gender" options={["All", "Male", "Female"]} active={activeGender} setter={setActiveGender} />
           </aside>
 
@@ -107,9 +107,9 @@ const CollectionPage = () => {
                           </div>
                         </div>
 
-                        {/* Action Button - Outside/Below the Image */}
+                        {/* Action Button - Fixed navigation to use URL parameters */}
                         <button
-                          onClick={() => navigate(`/productdetail?id=${product._id}`)}
+                          onClick={() => navigate(`/productdetail/${product._id}`)}
                           className={`mt-auto w-full py-4 rounded-2xl border ${theme.border} flex items-center justify-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] transition-all duration-300 group hover:bg-black hover:text-white dark:hover:bg-amber-600 dark:hover:text-black dark:hover:border-amber-600`}
                         >
                           See Detail
@@ -120,7 +120,7 @@ const CollectionPage = () => {
                   ))}
                 </div>
 
-                {/* Pagination (Keeping your existing logic) */}
+                {/* Pagination */}
                 {totalPages > 1 && (
                   <div className="mt-24 flex items-center justify-center gap-8">
                     <button

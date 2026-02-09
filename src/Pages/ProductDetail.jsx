@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom'; // Changed from useSearchParams to useParams
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import { cartService } from '../services/cartService';
 import { isAuthenticated } from '../utils/auth';
 import { 
-  ChevronLeft, ShoppingBag, Zap, ShieldCheck, 
+  ChevronLeft, Zap, ShieldCheck, 
   Minus, Plus, Info 
 } from 'lucide-react';
 
 const ProductDetail = () => {
-  const [searchParams] = useSearchParams();
-  const Id = searchParams.get("id");
+  const { id: productId } = useParams(); // Fixed: Get id from URL parameters
   const navigate = useNavigate();
   const isDark = useSelector((state) => state.theme.isDark);
 
@@ -23,11 +22,15 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!Id) { navigate('/products'); return; }
+    if (!productId) { 
+      navigate('/products'); 
+      return; 
+    }
+    
     const fetchDetail = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${Id}`);
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/products/${productId}`);
         const data = await res.json();
         if (data?.success && data?.data) {
           setProduct(data.data);
@@ -36,39 +39,52 @@ const ProductDetail = () => {
         }
       } catch (err) {
         toast.error('Identity fetch failed');
-      } finally { setLoading(false); }
+      } finally { 
+        setLoading(false); 
+      }
     };
     fetchDetail();
-  }, [Id, navigate]);
+  }, [productId, navigate]);
 
   const handleAddToCart = async (btn = 'cart') => {
-    if (!isAuthenticated()) { toast.warning('Authentication Required'); navigate('/login'); return; }
+    if (!isAuthenticated()) { 
+      toast.warning('Authentication Required'); 
+      navigate('/login'); 
+      return; 
+    }
+    
     try {
       setIsAdding(true);
       await cartService.addToCart(product._id, quantity, selectedSize, selectedColor);
-      if(btn === 'shoping')
-      {
-        navigate('/checkout')
+      
+      if(btn === 'shoping') {
+        navigate('/checkout');
+      } else {
+        toast.success('Secured in Bag');
       }
-      toast.success('Secured in Bag');
     } catch (err) {
       toast.error('Error');
-    } finally { setIsAdding(false); }
+    } finally { 
+      setIsAdding(false); 
+    }
   };
 
   const theme = isDark 
     ? { bg: 'bg-[#050505]', text: 'text-white', card: 'bg-[#111] border-white/5' }
     : { bg: 'bg-[#fafafa]', text: 'text-black', card: 'bg-white border-gray-100 shadow-xl' };
 
-  if (loading) return <div className={`h-screen w-full flex items-center justify-center ${theme.bg}`}><p className="animate-pulse text-amber-500 font-black uppercase text-[10px] tracking-[0.5em]">Loading Archive...</p></div>;
+  if (loading) return (
+    <div className={`h-screen w-full flex items-center justify-center ${theme.bg}`}>
+      <p className="animate-pulse text-amber-500 font-black uppercase text-[10px] tracking-[0.5em]">Loading Archive...</p>
+    </div>
+  );
+  
   if (!product) return null;
 
   const discountedPrice = product.price * (1 - (product.discount / 100));
 
   return (
-    <main className={`relative w-full ${theme.bg} ${theme.text} transition-colors duration-700 font-sans overflow-x-hidden
-      lg:h-screen lg:overflow-hidden` /* Lock screen on Laptop */
-    }>
+    <main className={`relative w-full ${theme.bg} ${theme.text} transition-colors duration-700 font-sans overflow-x-hidden lg:h-screen lg:overflow-hidden`}>
       
       {/* Scrollable Container for Mobile, Grid for Desktop */}
       <div className="flex flex-col lg:flex-row h-full w-full pt-24 lg:pt-0">
@@ -91,7 +107,7 @@ const ProductDetail = () => {
         </section>
 
         {/* RIGHT: CONTENT SECTION (Scrollable internally on Laptop if needed) */}
-        <section className="w-full  lg:w-1/2 h-auto lg:h-full  custom-scrollbar p-6 lg:p-20 flex flex-col justify-center">
+        <section className="w-full lg:w-1/2 h-auto lg:h-full p-6 lg:p-20 flex flex-col justify-center">
           <div className="max-w-xl space-y-8 animate-in fade-in slide-in-from-right-4 duration-700">
             
             <div className="space-y-3">
@@ -102,7 +118,9 @@ const ProductDetail = () => {
               <div className="flex items-center gap-4 text-3xl font-black tracking-tighter">
                 <span>₹{discountedPrice.toLocaleString()}</span>
                 {product.discount > 0 && (
-                  <span className="text-sm text-gray-500 line-through opacity-40 italic">₹{product.price.toLocaleString()}</span>
+                  <span className="text-sm text-gray-500 line-through opacity-40 italic">
+                    ₹{product.price.toLocaleString()}
+                  </span>
                 )}
               </div>
             </div>
@@ -143,15 +161,16 @@ const ProductDetail = () => {
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
-                onClick={handleAddToCart}
+                onClick={() => handleAddToCart('cart')}
                 disabled={isAdding || product.stock === 0}
-                className="flex-1 bg-white text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:bg-amber-500 transition-all active:scale-95"
+                className="flex-1 bg-white text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:bg-amber-500 transition-all active:scale-95 disabled:opacity-50"
               >
-                Add to Bag
+                {isAdding ? 'Adding...' : 'Add to Bag'}
               </button>
               <button 
-              onClick={()=>handleAddToCart('shoping')}
-                className="flex-1 bg-amber-600 text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:bg-amber-500 transition-all active:scale-95 flex items-center justify-center gap-2"
+                onClick={() => handleAddToCart('shoping')}
+                disabled={isAdding || product.stock === 0}
+                className="flex-1 bg-amber-600 text-black py-5 rounded-2xl font-black text-[11px] uppercase tracking-[0.3em] hover:bg-amber-500 transition-all active:scale-95 flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 <Zap size={14} fill="currentColor" /> Direct Entry
               </button>
@@ -166,7 +185,7 @@ const ProductDetail = () => {
               <div className="flex items-center gap-3">
                 <Info className="text-amber-500" size={18} />
                 <span className={`text-[9px] font-black uppercase tracking-widest ${product.stock < 5 ? 'text-red-500' : 'text-green-500'}`}>
-                   Stock: {product.stock}
+                  Stock: {product.stock}
                 </span>
               </div>
             </div>

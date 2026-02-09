@@ -1,4 +1,3 @@
-// Layout.jsx
 import React from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 
@@ -9,7 +8,7 @@ import Contact from '../Pages/Contact'
 import Products from '../Pages/Products'
 import Login from '../Pages/Login'
 import SignUp from '../Pages/SignUp'
-import ProductDetail from '../Pages/ProductDetail'
+import ProductDetail from '../Pages/ProductDetail' // Make sure this path is correct
 import ForgotPassword from '../Pages/ForgotPassword'
 import ResetPassword from '../Pages/ResetPassword'
 import TermsConditions from '../Pages/TermsConditions'
@@ -42,7 +41,6 @@ function Layout() {
     '/signup',
     '/forgot-password',
     '/reset-password',
-    '/productdetail',
     '/cart',
     '/checkout',
     '/order-confirmation',
@@ -58,7 +56,8 @@ function Layout() {
     }
     
     // Check if current path starts with the route (for admin/* routes)
-    return location.pathname.startsWith(route)
+    // Also exclude productdetail page
+    return location.pathname.startsWith(route) || location.pathname.startsWith('/productdetail')
   })
 
   return (
@@ -75,7 +74,8 @@ function Layout() {
         <Route path='/signup' element={<SignUp />} />
         <Route path='/forgot-password' element={<ForgotPassword />} />
         <Route path='/reset-password/:token' element={<ResetPassword />} />
-        <Route path='/productdetail/:id' element={<ProductDetail />} /> {/* Fixed: added :id parameter */}
+        {/* Fixed: Using URL parameter instead of query string */}
+        <Route path='/productdetail/:id' element={<ProductDetail />} />
         
         {/* Legal/Policy Pages */}
         <Route path='/terms' element={<TermsConditions />} />
