@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children, requiredRole = 'user' }) => {
   // Check role if required
   if (requiredRole === 'admin') {
     if (userRole !== 'admin') {
-      console.log("Role is not admin....")
+      console.log("Role is not admin...." + userRole)
       return <Navigate to="/" replace />;
     }
   }
