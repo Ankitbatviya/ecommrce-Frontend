@@ -73,7 +73,7 @@ const AdminProducts = () => {
     setEditingProduct(null);
   };
 
-  const theme = isDark 
+  const theme = isDark
     ? { card: 'bg-[#111] border-white/5', input: 'bg-white/5 border-white/10 text-white', option: 'bg-[#1a1a1a] text-white' }
     : { card: 'bg-white border-slate-200 shadow-sm', input: 'bg-white border-slate-300 text-slate-900', option: 'bg-white text-slate-900' };
 
@@ -150,8 +150,8 @@ const AdminProducts = () => {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-right space-x-2">
-                      <button onClick={() => { setEditingProduct(p); setNewProduct({...p}); setShowAddForm(true); }} className="p-2 text-slate-400 hover:text-amber-500"><Edit3 size={18} /></button>
-                      </td>
+                      <button onClick={() => { setEditingProduct(p); setNewProduct({ ...p }); setShowAddForm(true); }} className="p-2 text-slate-400 hover:text-amber-500"><Edit3 size={18} /></button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -164,22 +164,26 @@ const AdminProducts = () => {
       {showAddForm && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-300">
           <div className={`${isDark ? 'bg-[#0f0f0f] border-white/10' : 'bg-white border-slate-200'} border w-full max-w-lg rounded-[2.5rem] shadow-2xl p-8 relative overflow-hidden`}>
-            
+
             <div className="flex gap-2 mb-8">
-                <div className={`h-1 flex-1 rounded-full transition-all duration-500 ${formStep >= 1 ? 'bg-amber-500' : 'bg-white/10'}`} />
-                <div className={`h-1 flex-1 rounded-full transition-all duration-500 ${formStep === 2 ? 'bg-amber-500' : 'bg-white/10'}`} />
+              <div className={`h-1 flex-1 rounded-full transition-all duration-500 ${formStep >= 1 ? 'bg-amber-500' : 'bg-white/10'}`} />
+              <div className={`h-1 flex-1 rounded-full transition-all duration-500 ${formStep === 2 ? 'bg-amber-500' : 'bg-white/10'}`} />
             </div>
 
             <button onClick={handleCloseModal} className="absolute right-8 top-12 text-slate-500 hover:text-white transition-colors"><X size={20} /></button>
             <h2 className="text-xl font-black tracking-tighter mb-6">{editingProduct ? 'Modding System' : 'Init System'} // {formStep === 1 ? 'Identity' : 'Market'}</h2>
-            
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {formStep === 1 ? (
                 <div className="space-y-4 animate-in slide-in-from-left-5 duration-300">
                   <FormInput label="Identifier Name" name="name" value={newProduct.name} onChange={handleInputChange} required />
                   <div className="grid grid-cols-2 gap-4">
                     <FormInput label="Brand" name="brand" value={newProduct.brand} onChange={handleInputChange} required />
-                    <FormInput label="Author" name="author" value={newProduct.author} onChange={handleInputChange} />
+                    <FormInput label="Author" name="author" value={newProduct.author} onChange={handleInputChange} required />
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">Description</label>
+                    <textarea name="description" value={newProduct.description} onChange={handleInputChange} rows="2" className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-xs font-bold outline-none text-white scrollbar-hide" required placeholder="Product description..." />
                   </div>
                   <div>
                     <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">Image Stream</label>
@@ -192,12 +196,23 @@ const AdminProducts = () => {
               ) : (
                 <div className="space-y-4 animate-in slide-in-from-right-5 duration-300">
                   <div className="grid grid-cols-2 gap-4">
-                    <FormSelect label="Category" name="category" value={newProduct.category} onChange={handleInputChange} options={['Apparel', 'Electronics', 'Footwear', 'Accessories']} />
-                    <FormSelect label="Gender" name="gender" value={newProduct.gender} onChange={handleInputChange} options={['Male', 'Female', 'Unisex']} />
+                    <FormSelect label="Category" name="category" value={newProduct.category} onChange={handleInputChange} options={['Apparel', 'Electronics', 'Footwear', 'Accessories']} required />
+                    <FormSelect label="Gender" name="gender" value={newProduct.gender} onChange={handleInputChange} options={['Male', 'Female', 'Unisex']} required />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <FormInput label="Base (₹)" type="number" name="price" value={newProduct.price} onChange={handleInputChange} required />
+                    <FormInput label="Discount %" type="number" name="discount" value={newProduct.discount} onChange={handleInputChange} />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
                     <FormInput label="Stock" type="number" name="stock" value={newProduct.stock} onChange={handleInputChange} required />
+                    <div>
+                      <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">Colors</label>
+                      <input type="text" value={newProduct.colors.join(', ')} onChange={(e) => setNewProduct(prev => ({ ...prev, colors: e.target.value.split(',').map(item => item.trim()).filter(item => item) }))} className="w-full bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs font-bold outline-none text-white" placeholder="Red, Blue, Green" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[9px] font-black uppercase text-slate-500 tracking-widest block mb-2">Sizes</label>
+                    <input type="text" value={newProduct.sizes.join(', ')} onChange={(e) => setNewProduct(prev => ({ ...prev, sizes: e.target.value.split(',').map(item => item.trim()).filter(item => item) }))} className="w-full bg-white/5 border border-white/10 rounded-xl p-3.5 text-xs font-bold outline-none text-white" placeholder="S, M, L, XL" />
                   </div>
                   <div className="flex gap-3 pt-4">
                     <button type="button" onClick={() => setFormStep(1)} className={`p-4 rounded-xl border transition-all ${isDark ? 'bg-white/5 border-white/10 text-slate-400' : 'bg-slate-100 border-slate-200 text-slate-600'}`}><ChevronLeft size={20} /></button>
